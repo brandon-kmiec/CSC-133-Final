@@ -3,12 +3,16 @@ package Main;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import Data.Click;
+import Data.RECT;
 import Data.Sprite;
 import logic.Control;
 
 public class Main {
     // Fields (Static) below...
     public static Sprite s;
+    public static String str = "";
+    public static RECT r1;
     // End Static fields...
 
     public static void main(String[] args) {
@@ -38,12 +42,20 @@ public class Main {
         }
         g.dispose();
         s = new Sprite(0, 0, bi2, "bi2");
+        r1 = new RECT(17, 0, 111, 122);
     }
 
     /* This is your access to the "game loop" (It is a "callback" method from the Control class (do NOT modify that class!))*/
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
         ctrl.addSpriteToFrontBuffer(s);
+
+        if (Control.getMouseInput() != null) {
+            str = Control.getMouseInput().toString();
+            if (r1.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON))
+                str = "Tree was Clicked";
+        }
+        ctrl.drawString(200, 200, str, Color.white);     // Test Only
     }
 
     // Additional Static methods below...(if needed)
