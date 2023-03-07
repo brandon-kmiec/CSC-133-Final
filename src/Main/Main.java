@@ -1,18 +1,15 @@
 package Main;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 import Data.Click;
 import Data.RECT;
-import Data.Sprite;
 import logic.Control;
 
 public class Main {
     // Fields (Static) below...
-    public static Sprite s;
     public static String str = "";
-    public static RECT r1;
+    public static RECT[] rs;
     // End Static fields...
 
     public static void main(String[] args) {
@@ -23,39 +20,30 @@ public class Main {
     /* This is your access to things BEFORE the game loop starts */
     public static void start(Control ctrl) {
         // TODO: Code your starting conditions here...NOT DRAW CALLS HERE! (no addSprite or drawString)
-        BufferedImage pImage = ctrl.getSpriteFromBackBuffer("tree").getSprite();
-        BufferedImage bi2 = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi2.getGraphics();
-        Font temp = ctrl.getFont().deriveFont(Font.BOLD);
-        g.setFont(temp);
-        g.setColor(Color.green);
-        g.drawString("My tile-based tree level", 800, 540);
-        for (int i = 0; i < 15; i++) {
-            int x = i << 7, x2 = 0, x3 = 1792;
-            int y = 0, y2 = 1024, y3 = i << 7;
-            BufferedImage pCopy = pImage.getSubimage(0, 0, 128, 128);
-            g.drawImage(pCopy, x, y, null);     //Top
-            g.drawImage(pCopy, x, y2, null);    //Bottom
-            g.drawImage(pCopy, x2, y3, null);   //Left
-            g.drawImage(pCopy, x3, y3, null);   //Right
-        }
-        g.dispose();
-        s = new Sprite(0, 0, bi2, "bi2");
-        r1 = new RECT(17, 0, 111, 122);
+        rs = new RECT[3];
+        rs[0] = new RECT(166, 248, 261, 372, "Tree");
+        rs[1] = new RECT(546, 404, 618, 538, "Persephone");
+        rs[2] = new RECT(803, 358, 923, 462, "Cheese Burger");
     }
 
     /* This is your access to the "game loop" (It is a "callback" method from the Control class (do NOT modify that class!))*/
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
-        ctrl.addSpriteToFrontBuffer(s);
+        ctrl.addSpriteToFrontBuffer(150, 250, "tree");
+        ctrl.addSpriteToFrontBuffer(500, 400, "f0");
+        ctrl.addSpriteToFrontBuffer(800, 350, "cheeseBurger");
 
         if (Control.getMouseInput() != null) {
-            str = Control.getMouseInput().toString();
-            if (r1.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON))
-                str = "Tree was Clicked";
+            for (RECT r : rs) {
+                if (r.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+                    str = r.getTag() + " was Clicked.";
+                    break;
+                }
+                else
+                    str = "";
+            }
         }
-        ctrl.drawString(200, 200, str, Color.white);     // Test Only
+        ctrl.drawString(800, 540, str, Color.white);     // Test Only
     }
 
     // Additional Static methods below...(if needed)
