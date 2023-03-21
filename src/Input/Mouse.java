@@ -2,6 +2,7 @@ package Input;
 
 import Data.Click;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -10,12 +11,13 @@ public class Mouse implements MouseListener {
     private boolean isReady;
     private Click lastClick;
 
-
+    //Constructor
     public Mouse() {
         isReady = false;
         lastClick = null;
     }
 
+    //Methods
     @Override
     public void mouseClicked(MouseEvent e) {
 
@@ -42,7 +44,6 @@ public class Mouse implements MouseListener {
 
     }
 
-
     public Click pollClick() {
         if (!isReady)
             return null;
@@ -51,8 +52,11 @@ public class Mouse implements MouseListener {
         return lastClick;
     }
 
-
     public boolean isReady() {
         return isReady;
+    }
+
+    public static Point getMouseCoords() {
+        return MouseInfo.getPointerInfo().getLocation();
     }
 }

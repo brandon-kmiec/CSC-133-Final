@@ -14,6 +14,7 @@ public class Click {
     public static final int FORWARD_BUTTON = 5;
 
 
+    //Constructor
     public Click(int x, int y, int button) {
         this.x = x;
         this.y = y;
@@ -21,20 +22,18 @@ public class Click {
     }
 
 
+    //Methods
     public int getX() {
         return x;
     }
-
 
     public int getY() {
         return y;
     }
 
-
     public int getButton() {
         return button;
     }
-
 
     @Override
     public String toString() {

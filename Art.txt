@@ -1,3 +1,7 @@
-Art/f.png*f0
-Art/tree.png*tree
 Art/cheeseBurger.png*cheeseBurger
+Art/c_idle.png*c_idle
+Art/c_leftfoot.png*c_leftfoot
+Art/c_rightfoot.png*c_rightfoot
+Art/f0.png*f0
+Art/f1.png*f1
+Art/tree.png*tree
