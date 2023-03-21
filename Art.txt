@@ -1,5 +1,6 @@
 Art/cheeseBurger.png*cheeseBurger
 Art/c_idle.png*c_idle
+Art/c_idle2.png*c_idle2
 Art/c_leftfoot.png*c_leftfoot
 Art/c_rightfoot.png*c_rightfoot
 Art/f0.png*f0
