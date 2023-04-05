@@ -1,0 +1,4 @@
+show_sprite: 100, 100, f0
+#text: Howdy Partner!
+#text: test
+show_sprite: 200, 200, tree

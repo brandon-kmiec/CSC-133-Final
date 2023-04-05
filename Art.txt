@@ -5,4 +5,5 @@ Art/c_leftfoot.png*c_leftfoot
 Art/c_rightfoot.png*c_rightfoot
 Art/f0.png*f0
 Art/f1.png*f1
+Art/saveicon.png*saveicon
 Art/tree.png*tree
