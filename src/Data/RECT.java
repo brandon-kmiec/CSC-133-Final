@@ -78,4 +78,17 @@ public class RECT {
             return false;   // Not our button
         return isCollision(c.getX(), c.getY());
     }
+
+    @Override
+    public String toString() {
+        return "RECT{" +
+                "x1=" + x1 +
+                ", x2=" + x2 +
+                ", y1=" + y1 +
+                ", y2=" + y2 +
+                ", tag='" + tag + '\'' +
+                ", hoverLabel='" + hoverLabel + '\'' +
+                ", gHover=" + gHover +
+                '}';
+    }
 }

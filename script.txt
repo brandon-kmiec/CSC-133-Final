@@ -1,4 +1,16 @@
-show_sprite: 100, 100, f0
+# Here is the syntax for the commands:
+#show_sprite: x, y, sprite_tag
+#text: text
+#text: x, y, text
+#text_hover_rect: x1, y1, x2, y2, tag, hover_label
+
 #text: Howdy Partner!
-#text: test
-show_sprite: 200, 200, tree
+text: test
+text: 500, 500, Hello World!
+text: 800, 800, Goodbye!
+
+show_sprite: 700, 100, tree
+show_sprite: 300, 300, cheeseBurger
+
+text_hover_rect: 300, 300, 428, 428, cheeseBurger, This is a cheeseBurger!
+text_hover_rect: 700, 100, 828, 228, tree, This is a tree!
