@@ -6,6 +6,7 @@ import Data.RECT;
 import FileIO.EZFileRead;
 import FileIO.EZFileWrite;
 import Input.Mouse;
+import ScriptingEngine.Interpreter;
 import logic.Control;
 
 import java.awt.*;
@@ -20,9 +21,7 @@ public class Main {
     private static int[] buffer;
     private static RECT disk;
     private static final int dropShadow = 2;
-    private static ArrayList<Command> commands;
-    private static String hoverLabelStr = "";
-    private static String tagStr = "";
+    private static Interpreter interpreter;
 
 
     public static void main(String[] args) {
@@ -35,7 +34,7 @@ public class Main {
     public static void start(Control ctrl) {
         // TODO: Code your starting conditions here...NOT DRAW CALLS HERE! (no addSprite or drawString)
         EZFileRead ezr = new EZFileRead("script.txt");
-        commands = new ArrayList<>();
+        ArrayList<Command> commands = new ArrayList<>();
         for (int i = 0; i < ezr.getNumLines(); i++) {
             String raw = ezr.getLine(i);
             raw = raw.trim();
@@ -52,55 +51,18 @@ public class Main {
             int value = (int) (Math.random() * 100);
             buffer[i] = value;
         }
+
+        interpreter = new Interpreter(ctrl, commands);
     }
 
     /* This is your access to the "game loop" (It is a "callback" method from the Control class (do NOT modify that class!))*/
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
+        interpreter.checkCommands();
+
         Point p = Mouse.getMouseCoords();
         int x = (int) p.getX();
         int y = (int) p.getY();
-
-        for (Command c : commands) {
-            if (c.isCommand("show_sprite") && c.getNumParams() == 3) {
-                int sprite_x = Integer.parseInt(c.getParamByIndex(0));
-                int sprite_y = Integer.parseInt(c.getParamByIndex(1));
-                String tag = c.getParamByIndex(2);
-                ctrl.addSpriteToFrontBuffer(sprite_x, sprite_y, tag);
-            } else if (c.isCommand("text") && c.getNumParams() == 1) {
-                String display = c.getParamByIndex(0);
-                ctrl.drawString(0, 250, display, Color.WHITE);
-            } else if (c.isCommand("text") && c.getNumParams() == 3) {
-                int sprite_x = Integer.parseInt(c.getParamByIndex(0));
-                int sprite_y = Integer.parseInt(c.getParamByIndex(1));
-                String display = c.getParamByIndex(2);
-                ctrl.drawString(sprite_x, sprite_y, display, Color.WHITE);
-            } else if (c.isCommand("text_hover_rect") && c.getNumParams() == 6) {
-                int x1 = Integer.parseInt(c.getParamByIndex(0));
-                int y1 = Integer.parseInt(c.getParamByIndex(1));
-                int x2 = Integer.parseInt(c.getParamByIndex(2));
-                int y2 = Integer.parseInt(c.getParamByIndex(3));
-                String tag = c.getParamByIndex(4);
-                String hoverLabel = c.getParamByIndex(5);
-                RECT testRect = new RECT(x1, y1, x2, y2, tag, hoverLabel);
-
-                if (testRect.isCollision(x, y))
-                    hoverLabelStr = testRect.getHoverLabel();
-                else
-                    hoverLabelStr = "";
-
-                if (Control.getMouseInput() != null)
-                    if (testRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-                        tagStr = testRect.getTag();
-                        break;
-                    } else
-                        tagStr = "";
-
-                ctrl.drawString(x, (y - 2), hoverLabelStr, Color.BLACK);
-                ctrl.drawString(x - dropShadow, (y - dropShadow) - 2, hoverLabelStr, Color.yellow);
-                ctrl.drawString(150, 800, tagStr, Color.WHITE);
-            }
-        }
 
         ctrl.addSpriteToFrontBuffer(100, 50, "saveicon");
 
