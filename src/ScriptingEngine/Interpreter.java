@@ -84,7 +84,7 @@ public class Interpreter {
 
             if (Control.getMouseInput() != null)
                 if (testRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-                    tagStr = testRect.getTag();
+                    tagStr = testRect.getTag() + " was clicked";
                     break;
                 } else
                     tagStr = "";
