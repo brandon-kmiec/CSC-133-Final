@@ -5,5 +5,11 @@ Art/c_leftfoot.png*c_leftfoot
 Art/c_rightfoot.png*c_rightfoot
 Art/f0.png*f0
 Art/f1.png*f1
+Art/forest.jpg*forest
+Art/raindrop1.png*raindrop1
+Art/raindrop2.png*raindrop2
+Art/raindrop3.png*raindrop3
+Art/raindrop4.png*raindrop4
+Art/raindrop5.png*raindrop5
 Art/saveicon.png*saveicon
 Art/tree.png*tree
