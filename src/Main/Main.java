@@ -82,16 +82,15 @@ public class Main {
         Iterator<Sprite> rainParticleSystemParticles = rainParticleSystem.getParticlesSprites(ctrl);
         Iterator<Sprite> smokeParticleSystemParticles = smokeParticleSystem.getParticlesSprites(ctrl);
 
-        while (rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()){
+        while (rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()) {
             Sprite rainPar = rainParticleSystemParticles.next();
             Sprite smokePar = smokeParticleSystemParticles.next();
             //ctrl.addSpriteToFrontBuffer(par2.getX(), par2.getY(), par2.getSpriteTag());
             //ctrl.addSpriteToFrontBuffer(smokePar.getX(), smokePar.getY(), smokePar.getSpriteTag());
-
             ctrl.addSpriteToFrontBuffer(rainPar);
             ctrl.addSpriteToFrontBuffer(smokePar);
         }
-//
+
 //        Sprite test = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("tree").getSprite(), "tree");
 //        ctrl.addSpriteToFrontBuffer(test);
 //

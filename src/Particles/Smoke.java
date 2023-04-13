@@ -18,13 +18,13 @@ public class Smoke {
         this.changeDirection = changeDirection;
 
         int xSpeed, ySpeed;
-        if (changeDirection) {
+
+        if (changeDirection)
             xSpeed = 1;
-            ySpeed = -3;
-        } else {
+        else
             xSpeed = -1;
-            ySpeed = -3;
-        }
+        ySpeed = -3;
+
         parts = new ParticleSystem(numParticles, xpos, ypos, xRange, yRange, minLife, maxLife, xSpeed, ySpeed,
                 16, 20, spriteTags);
     }
