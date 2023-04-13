@@ -42,6 +42,14 @@ public class Particle {
         y = newY;
     }
 
+    public void changeXMove(int newXMove) {
+        xMove = newXMove;
+    }
+
+    public void changeYMove(int newYMove) {
+        yMove = newYMove;
+    }
+
     public int getX() {
         return x;
     }

@@ -1,18 +1,20 @@
 package Main;
 
-import Data.Click;
-import Data.Command;
-import Data.RECT;
+import Data.*;
 import Data.Frame;
 import FileIO.EZFileRead;
 import FileIO.EZFileWrite;
 import Input.Mouse;
+import Particles.Particle;
 import Particles.ParticleSystem;
 import Particles.Rain;
+import Particles.Smoke;
 import ScriptingEngine.Interpreter;
 import logic.Control;
+import Graphics.Sprites;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,12 +23,15 @@ import java.util.StringTokenizer;
 public class Main {
     // Fields (Static) below...
     public static Rain rain;
+    public static Smoke smoke;
 //    public static String s = "";
 //    public static String s2 = "";
 //    private static int[] buffer;
 //    private static RECT disk;
 //    private static final int dropShadow = 2;
 //    private static Interpreter interpreter;
+
+    public static Sprite s;
 
 
     public static void main(String[] args) {
@@ -38,7 +43,12 @@ public class Main {
     /* This is your access to things BEFORE the game loop starts */
     public static void start(Control ctrl) {
         // TODO: Code your starting conditions here...NOT DRAW CALLS HERE! (no addSprite or drawString)
+
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
+        smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
+        // TODO: 4/12/2023 try to fix smoke (right now it works better as if it was fire) (change smoke to fire??? and
+        //  try to remake smoke)
+
 
 //        EZFileRead ezr = new EZFileRead("script.txt");
 //        ArrayList<Command> commands = new ArrayList<>();
@@ -66,12 +76,28 @@ public class Main {
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
         ctrl.addSpriteToFrontBuffer(0, 0, "forest");
-        ParticleSystem pm2 = rain.getParticleSystem();
-        Iterator<Frame> it2 = pm2.getParticles();
-        while (it2.hasNext()){
-            Frame par2 = it2.next();
-            ctrl.addSpriteToFrontBuffer(par2.getX(), par2.getY(), par2.getSpriteTag());
+        ParticleSystem rainParticleSystem = rain.getParticleSystem();
+        ParticleSystem smokeParticleSystem = smoke.getParticleSystem();
+
+        Iterator<Sprite> rainParticleSystemParticles = rainParticleSystem.getParticlesSprites(ctrl);
+        Iterator<Sprite> smokeParticleSystemParticles = smokeParticleSystem.getParticlesSprites(ctrl);
+
+        while (rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()){
+            Sprite rainPar = rainParticleSystemParticles.next();
+            Sprite smokePar = smokeParticleSystemParticles.next();
+            //ctrl.addSpriteToFrontBuffer(par2.getX(), par2.getY(), par2.getSpriteTag());
+            //ctrl.addSpriteToFrontBuffer(smokePar.getX(), smokePar.getY(), smokePar.getSpriteTag());
+
+            ctrl.addSpriteToFrontBuffer(rainPar);
+            ctrl.addSpriteToFrontBuffer(smokePar);
         }
+//
+//        Sprite test = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("tree").getSprite(), "tree");
+//        ctrl.addSpriteToFrontBuffer(test);
+//
+//        Sprite test2 = new Sprite(200, 200, ctrl.getSpriteFromBackBuffer("tree").getSprite(), "tree");
+//        ctrl.addSpriteToFrontBuffer(test2);
+
 
 //        interpreter.checkCommands();
 //

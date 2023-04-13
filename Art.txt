@@ -12,4 +12,9 @@ Art/raindrop3.png*raindrop3
 Art/raindrop4.png*raindrop4
 Art/raindrop5.png*raindrop5
 Art/saveicon.png*saveicon
+Art/smoke1.png*smoke1
+Art/smoke2.png*smoke2
+Art/smoke3.png*smoke3
+Art/smoke4.png*smoke4
+Art/smoke5.png*smoke5
 Art/tree.png*tree
