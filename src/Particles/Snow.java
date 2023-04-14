@@ -5,7 +5,6 @@ public class Snow {
     private ParticleSystem parts;
     private String[] spriteTags;
     private static final int swayRange = 25;
-    private int leftBound, rightBound;
 
     // Constructor
     public Snow(int xpos, int ypos, int xRange, int yRange, int minLife, int maxLife, int numParticles) {
@@ -37,8 +36,8 @@ public class Snow {
             int range = life / stages;
             int age = pa[i].getAge();
 
-            leftBound = pa[i].getRootX() - swayRange;
-            rightBound = pa[i].getRootX() + swayRange;
+            int leftBound = pa[i].getRootX() - swayRange;
+            int rightBound = pa[i].getRootX() + swayRange;
 
             if (pa[i].getX() > rightBound)
                 pa[i].changeXMove(-5);

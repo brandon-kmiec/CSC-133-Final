@@ -44,7 +44,7 @@ public class Main {
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
-        snow = new Snow(-50, 0, 1280, 90, 50, 175, 150);
+        snow = new Snow(-50, 0, 1350, 90, 50, 175, 150);
         // TODO: 4/12/2023 try to fix smoke (right now it works better as if it was fire) (change smoke to fire??? and
         //  try to remake smoke)
 
