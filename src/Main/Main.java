@@ -5,10 +5,7 @@ import Data.Frame;
 import FileIO.EZFileRead;
 import FileIO.EZFileWrite;
 import Input.Mouse;
-import Particles.Particle;
-import Particles.ParticleSystem;
-import Particles.Rain;
-import Particles.Smoke;
+import Particles.*;
 import ScriptingEngine.Interpreter;
 import logic.Control;
 import Graphics.Sprites;
@@ -24,6 +21,7 @@ public class Main {
     // Fields (Static) below...
     public static Rain rain;
     public static Smoke smoke;
+    public static Snow snow;
 //    public static String s = "";
 //    public static String s2 = "";
 //    private static int[] buffer;
@@ -46,6 +44,7 @@ public class Main {
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
+        snow = new Snow(-50, 0, 1280, 90, 50, 175, 150);
         // TODO: 4/12/2023 try to fix smoke (right now it works better as if it was fire) (change smoke to fire??? and
         //  try to remake smoke)
 
@@ -76,19 +75,36 @@ public class Main {
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
         ctrl.addSpriteToFrontBuffer(0, 0, "forest");
+//        ParticleSystem rainParticleSystem = rain.getParticleSystem();
+//        ParticleSystem smokeParticleSystem = smoke.getParticleSystem();
+//
+//        Iterator<Sprite> rainParticleSystemParticles = rainParticleSystem.getParticles(ctrl);
+//        Iterator<Sprite> smokeParticleSystemParticles = smokeParticleSystem.getParticles(ctrl);
+//
+//        while (rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()) {
+//            Sprite rainPar = rainParticleSystemParticles.next();
+//            Sprite smokePar = smokeParticleSystemParticles.next();
+//            //ctrl.addSpriteToFrontBuffer(par2.getX(), par2.getY(), par2.getSpriteTag());
+//            //ctrl.addSpriteToFrontBuffer(smokePar.getX(), smokePar.getY(), smokePar.getSpriteTag());
+//            ctrl.addSpriteToFrontBuffer(rainPar);
+//            ctrl.addSpriteToFrontBuffer(smokePar);
+//        }
+
         ParticleSystem rainParticleSystem = rain.getParticleSystem();
         ParticleSystem smokeParticleSystem = smoke.getParticleSystem();
+        ParticleSystem snowParticleSystem = snow.getParticleSystem();
 
-        Iterator<Sprite> rainParticleSystemParticles = rainParticleSystem.getParticlesSprites(ctrl);
-        Iterator<Sprite> smokeParticleSystemParticles = smokeParticleSystem.getParticlesSprites(ctrl);
+        Iterator<Frame> rainParticleSystemParticles = rainParticleSystem.getParticles();
+        Iterator<Frame> smokeParticleSystemParticles = smokeParticleSystem.getParticles();
+        Iterator<Frame> snowParticleSystemParticles = snowParticleSystem.getParticles();
 
-        while (rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()) {
-            Sprite rainPar = rainParticleSystemParticles.next();
-            Sprite smokePar = smokeParticleSystemParticles.next();
-            //ctrl.addSpriteToFrontBuffer(par2.getX(), par2.getY(), par2.getSpriteTag());
-            //ctrl.addSpriteToFrontBuffer(smokePar.getX(), smokePar.getY(), smokePar.getSpriteTag());
-            ctrl.addSpriteToFrontBuffer(rainPar);
-            ctrl.addSpriteToFrontBuffer(smokePar);
+        while (snowParticleSystemParticles.hasNext()/*rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()*/) {
+            Frame rainPar = rainParticleSystemParticles.next();
+            Frame smokePar = smokeParticleSystemParticles.next();
+            Frame snowPar = snowParticleSystemParticles.next();
+            //ctrl.addSpriteToFrontBuffer(rainPar);
+            //ctrl.addSpriteToFrontBuffer(smokePar);
+            ctrl.addSpriteToFrontBuffer(snowPar);
         }
 
 //        Sprite test = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("tree").getSprite(), "tree");

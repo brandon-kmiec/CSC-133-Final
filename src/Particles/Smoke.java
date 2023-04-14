@@ -1,11 +1,12 @@
 package Particles;
 
 public class Smoke {
+    // Fields
     private ParticleSystem parts;
     private String[] spriteTags;
     private boolean changeDirection;
 
-
+    // Constructor
     public Smoke(int xpos, int ypos, int xRange, int yRange, int minLife, int maxLife, int numParticles,
                  boolean changeDirection) {
         spriteTags = new String[5];
@@ -29,7 +30,7 @@ public class Smoke {
                 16, 20, spriteTags);
     }
 
-
+    // Methods
     private void updateParticleSprites() {
         Particle[] pa = parts.getParticleArray();
         for (int i = 0; i < pa.length; i++) {
@@ -73,16 +74,6 @@ public class Smoke {
                     pa[i].changeYMove(-1);
                 }
             }
-//            if (pa[i].getY() <= 300 && pa[i].getY() >= 150) {
-//                pa[i].changeXMove(-3);
-//                pa[i].changeYMove(-3);
-//            } else if (pa[i].getY() < 150) {
-//                pa[i].changeXMove(-3);
-//                pa[i].changeYMove(-2);
-//            } else {
-//                pa[i].changeXMove(-1);
-//                pa[i].changeYMove(-3);
-//            }
 
             for (int j = 0; j < stages; j++) {
                 if (age >= (range * j) && age < (range * (j + 1))) {

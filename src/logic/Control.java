@@ -92,9 +92,11 @@ public class Control {
     }
 
     public void addSpriteToFrontBuffer(Frame frame) {
-        Sprite s = backbuffer.getSpriteByTag(frame.getSpriteTag());
-        s.moveXAbsolute(frame.getX());
-        s.moveYAbsolute(frame.getY());
+//        Sprite s = backbuffer.getSpriteByTag(frame.getSpriteTag());
+        Sprite s = new Sprite(frame.getX(), frame.getY(), getSpriteFromBackBuffer(frame.getSpriteTag()).getSprite(),
+                frame.getSpriteTag());
+//        s.moveXAbsolute(frame.getX());
+//        s.moveYAbsolute(frame.getY());
         frontbuffer.addSprite(s);
     }
 

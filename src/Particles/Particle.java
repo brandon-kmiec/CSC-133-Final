@@ -54,6 +54,10 @@ public class Particle {
         return x;
     }
 
+    public int getRootX() {
+        return rootX;
+    }
+
     public int getY() {
         return y;
     }

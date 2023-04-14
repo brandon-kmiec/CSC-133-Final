@@ -1,8 +1,6 @@
 package Particles;
 
 import Data.Frame;
-import Data.Sprite;
-import logic.Control;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,15 +59,14 @@ public class ParticleSystem {
         return parts.iterator();
     }
 
-    public Iterator<Sprite> getParticlesSprites(Control ctrl) {
-        List<Sprite> parts = new ArrayList<>();
-        for (int i = 0; i < particles.length; i++) {
-            Frame tmp = particles[i].getCurrentFrame();
-            Sprite temp = new Sprite(tmp.getX(), tmp.getY(),
-                    ctrl.getSpriteFromBackBuffer(tmp.getSpriteTag()).getSprite(), tmp.getSpriteTag());
-            parts.add(temp);
-
-        }
-        return parts.iterator();
-    }
+//    public Iterator<Sprite> getParticles(Control ctrl) {
+//        List<Sprite> parts = new ArrayList<>();
+//        for (int i = 0; i < particles.length; i++) {
+//            Frame tmp = particles[i].getCurrentFrame();
+//            Sprite temp = new Sprite(tmp.getX(), tmp.getY(),
+//                    ctrl.getSpriteFromBackBuffer(tmp.getSpriteTag()).getSprite(), tmp.getSpriteTag());
+//            parts.add(temp);
+//        }
+//        return parts.iterator();
+//    }
 }

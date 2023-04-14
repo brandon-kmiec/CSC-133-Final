@@ -17,4 +17,9 @@ Art/smoke2.png*smoke2
 Art/smoke3.png*smoke3
 Art/smoke4.png*smoke4
 Art/smoke5.png*smoke5
+Art/Snow1.png*Snow1
+Art/Snow2.png*Snow2
+Art/Snow3.png*Snow3
+Art/Snow4.png*Snow4
+Art/Snow5.png*Snow5
 Art/tree.png*tree
