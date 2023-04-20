@@ -29,8 +29,10 @@ public class Control {
     private Graphic graphic;
     private Sprites backbuffer;
     private Sprites frontbuffer;
+    private Sprites hudBuffer;
     private Sprites overlaybuffer;
     private ArrayList<gameString> gs;
+    private ArrayList<gameString> hudText;
     private Keyb kb;
     private Mouse mouse;
     private gameLoop gl;
@@ -43,13 +45,15 @@ public class Control {
         graphic = new Graphic();                // Place screen into Graphics mode (1280 x 720) so we can use full screen exclusive graphic routines!
         backbuffer = new Sprites();                // Create place to store game ALL game sprites needed for project (images)
         frontbuffer = new Sprites();            // This is the "front buffer" that goes to the renderer every frame
+        hudBuffer = new Sprites();              // This is for our new "HUD Buffer"
         overlaybuffer = new Sprites();            // Allows things above the frontbuffer (overlays or draws on top of...things like custom mouse cursors, etc.)
         gs = new ArrayList<>();                    // Set up for our gamestrings (graphical text printing; System.out.println doesn't work in graphics mode!)
+        hudText = new ArrayList<>();            // This is for HUD-level text (sits above HUD images)
         setupFont();                            // Set up our program to use a font custom (stored in "Font" subfolder)
         loadArtIntoBackBuffer();                // Loads the art referenced in "Art.txt" into the backbuffer of sprites
         kb = new Keyb();                        // Initialize the keyboard handler
         mouse = new Mouse();                    // Set up new mouse handler
-        gl = new gameLoop(graphic, gs, frontbuffer, overlaybuffer);        // Sets up our render loop
+        gl = new gameLoop(graphic, gs, frontbuffer, hudText, hudBuffer, overlaybuffer);        // Sets up our render loop
         graphic.setKeyListener(kb);                                        // Sets our graphics handler up to listen for keyboard input (Asynchronous!)
         graphic.setMouseListener(mouse);
         Main.start(this);
@@ -67,8 +71,10 @@ public class Control {
                 drawString(1110, 20, getMouseCoords(), Color.white);
             gl.run();                                                            // Render the graphical data for the frame!
             frontbuffer.clearSprites();                                        // Clear the front sprite buffer for the next frame
+            hudBuffer.clearSprites();
             overlaybuffer.clearSprites();                                        // Clears the overlay buffer for the next frame
             gs.clear();                                                        // Clears all of the gameStrings for that frame
+            hudText.clear();
             key = kb.getInputCodeX();                                            // Get keyboard input for next pass
             mouseInput = mouse.pollClick();                                     // Retrieve mouse input into static singleton
         }
@@ -77,6 +83,10 @@ public class Control {
     // WARNING! DO NOT MODIFY THE CODE HERE! THIS IS HERE TO GET THE GAME LIBRARY TO WORK!
     public void drawString(int x, int y, String text, Color c) {
         gs.add(new gameString(c, x, y, text, font, 1.0f));
+    }
+
+    public void drawHudString(int x, int y, String text, Color c) {
+        hudText.add(new gameString(c, x, y, text, font, 1.0f));
     }
 
     // WARNING! DO NOT MODIFY THE CODE HERE! THIS IS HERE TO GET THE GAME LIBRARY TO WORK!
@@ -98,6 +108,21 @@ public class Control {
 //        s.moveXAbsolute(frame.getX());
 //        s.moveYAbsolute(frame.getY());
         frontbuffer.addSprite(s);
+    }
+
+    public void addSpriteToHudBuffer(int x, int y, String spriteTag) {
+        Sprite s = backbuffer.getSpriteByTag(spriteTag);
+        s.moveXAbsolute(x);
+        s.moveYAbsolute(y);
+        hudBuffer.addSprite(s);
+    }
+    // add other addSpriteToHudBuffer methods that receive frame or sprite (similar to addSpriteToFrontBuffer methods)???
+
+    public void addSpriteToOverlayBuffer(int x, int y, String spriteTag) {
+        Sprite s = backbuffer.getSpriteByTag(spriteTag);
+        s.moveXAbsolute(x);
+        s.moveYAbsolute(y);
+        overlaybuffer.addSprite(s);
     }
 
     // WARNING! DO NOT MODIFY THE CODE HERE! THIS IS HERE TO GET THE GAME LIBRARY TO WORK!
@@ -144,5 +169,9 @@ public class Control {
 
     public static Click getMouseInput() {
         return mouseInput;
+    }
+
+    public void hideDefaultCursor() {
+        graphic.hideCursor();
     }
 }
