@@ -17,7 +17,6 @@ public class Main {
     public static Smoke smoke;
     public static Snow snow;
     private static int[] buffer;
-    public static Sprite s;
 
 
     public static void main(String[] args) {
