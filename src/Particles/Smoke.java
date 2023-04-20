@@ -33,51 +33,51 @@ public class Smoke {
     // Methods
     private void updateParticleSprites() {
         Particle[] pa = parts.getParticleArray();
-        for (int i = 0; i < pa.length; i++) {
+        for (Particle particle : pa) {
             int stages = spriteTags.length;
-            int life = pa[i].getLifeCycle();
+            int life = particle.getLifeCycle();
             int range = life / stages;
-            int age = pa[i].getAge();
+            int age = particle.getAge();
 
             if (changeDirection) {
-                if (pa[i].getY() > 400) {
-                    pa[i].changeXMove(0);
-                    pa[i].changeYMove(-3);
-                } else if (pa[i].getY() > 300 && pa[i].getY() <= 400) {
-                    pa[i].changeXMove(1);
-                    pa[i].changeYMove(-3);
-                } else if (pa[i].getY() > 200 && pa[i].getY() <= 300) {
-                    pa[i].changeXMove(2);
-                    pa[i].changeYMove(-2);
-                } else if (pa[i].getY() > 100 && pa[i].getY() <= 200) {
-                    pa[i].changeXMove(3);
-                    pa[i].changeYMove(-2);
-                } else if (pa[i].getY() > 0 && pa[i].getY() <= 100) {
-                    pa[i].changeXMove(3);
-                    pa[i].changeYMove(-1);
+                if (particle.getY() > 400) {
+                    particle.changeXMove(0);
+                    particle.changeYMove(-3);
+                } else if (particle.getY() > 300 && particle.getY() <= 400) {
+                    particle.changeXMove(1);
+                    particle.changeYMove(-3);
+                } else if (particle.getY() > 200 && particle.getY() <= 300) {
+                    particle.changeXMove(2);
+                    particle.changeYMove(-2);
+                } else if (particle.getY() > 100 && particle.getY() <= 200) {
+                    particle.changeXMove(3);
+                    particle.changeYMove(-2);
+                } else if (particle.getY() > 0 && particle.getY() <= 100) {
+                    particle.changeXMove(3);
+                    particle.changeYMove(-1);
                 }
             } else {
-                if (pa[i].getY() > 400) {
-                    pa[i].changeXMove(0);
-                    pa[i].changeYMove(-3);
-                } else if (pa[i].getY() > 300 && pa[i].getY() <= 400) {
-                    pa[i].changeXMove(-1);
-                    pa[i].changeYMove(-3);
-                } else if (pa[i].getY() > 200 && pa[i].getY() <= 300) {
-                    pa[i].changeXMove(-2);
-                    pa[i].changeYMove(-2);
-                } else if (pa[i].getY() > 100 && pa[i].getY() <= 200) {
-                    pa[i].changeXMove(-3);
-                    pa[i].changeYMove(-2);
-                } else if (pa[i].getY() > 0 && pa[i].getY() <= 100) {
-                    pa[i].changeXMove(-3);
-                    pa[i].changeYMove(-1);
+                if (particle.getY() > 400) {
+                    particle.changeXMove(0);
+                    particle.changeYMove(-3);
+                } else if (particle.getY() > 300 && particle.getY() <= 400) {
+                    particle.changeXMove(-1);
+                    particle.changeYMove(-3);
+                } else if (particle.getY() > 200 && particle.getY() <= 300) {
+                    particle.changeXMove(-2);
+                    particle.changeYMove(-2);
+                } else if (particle.getY() > 100 && particle.getY() <= 200) {
+                    particle.changeXMove(-3);
+                    particle.changeYMove(-2);
+                } else if (particle.getY() > 0 && particle.getY() <= 100) {
+                    particle.changeXMove(-3);
+                    particle.changeYMove(-1);
                 }
             }
 
             for (int j = 0; j < stages; j++) {
                 if (age >= (range * j) && age < (range * (j + 1))) {
-                    pa[i].changeSprite(spriteTags[j]);
+                    particle.changeSprite(spriteTags[j]);
                     break;
                 }
             }

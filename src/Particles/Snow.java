@@ -4,7 +4,7 @@ public class Snow {
     // Fields
     private ParticleSystem parts;
     private String[] spriteTags;
-    private static final int swayRange = 25;
+    private static final int swayRange = Particle.rollDie(25) + 25;
 
     // Constructor
     public Snow(int xpos, int ypos, int xRange, int yRange, int minLife, int maxLife, int numParticles) {
@@ -16,7 +16,7 @@ public class Snow {
         spriteTags[4] = "snow5";
 
         int xSpeed;
-        int ySpeed = 5;
+        int ySpeed = 3;
 
         if (Particle.rollDie(100) >= 50)
             xSpeed = 3;
@@ -30,23 +30,23 @@ public class Snow {
     // Methods
     private void updateParticleSprites() {
         Particle[] pa = parts.getParticleArray();
-        for (int i = 0; i < pa.length; i++) {
+        for (Particle particle : pa) {
             int stages = spriteTags.length;
-            int life = pa[i].getLifeCycle();
+            int life = particle.getLifeCycle();
             int range = life / stages;
-            int age = pa[i].getAge();
+            int age = particle.getAge();
 
-            int leftBound = pa[i].getRootX() - swayRange;
-            int rightBound = pa[i].getRootX() + swayRange;
+            int leftBound = particle.getRootX() - swayRange;
+            int rightBound = particle.getRootX() + swayRange;
 
-            if (pa[i].getX() > rightBound)
-                pa[i].changeXMove(-5);
-            else if (pa[i].getX() < leftBound)
-                pa[i].changeXMove(5);
+            if (particle.getX() > rightBound)
+                particle.changeXMove(-3);
+            else if (particle.getX() < leftBound)
+                particle.changeXMove(3);
 
             for (int j = 0; j < stages; j++) {
                 if (age >= (range * j) && age < (range * (j + 1))) {
-                    pa[i].changeSprite(spriteTags[j]);
+                    particle.changeSprite(spriteTags[j]);
                     break;
                 }
             }

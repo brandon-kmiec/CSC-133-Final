@@ -1,14 +1,11 @@
 package Main;
 
-import Data.*;
-import Data.Frame;
 import FileIO.EZFileRead;
 import FileIO.EZFileWrite;
 import Particles.*;
 import logic.Control;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -31,8 +28,7 @@ public class Main {
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
-        snow = new Snow(-50, 0, 1350, 90, 50, 175, 150);
-
+        snow = new Snow(-50, 0, 1350, 90, 50, 250, 150);
     }
 
     /* This is your access to the "game loop" (It is a "callback" method from the Control class (do NOT modify that class!))*/
@@ -40,22 +36,28 @@ public class Main {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
         ctrl.addSpriteToFrontBuffer(0, 0, "forest");
 
-        ParticleSystem rainParticleSystem = rain.getParticleSystem();
-        ParticleSystem smokeParticleSystem = smoke.getParticleSystem();
-        ParticleSystem snowParticleSystem = snow.getParticleSystem();
+        //UpdateParticles rainParticles = new UpdateParticles(ctrl, rain.getParticleSystem());
+        //UpdateParticles smokeParticles = new UpdateParticles(ctrl, smoke.getParticleSystem());
+        UpdateParticles snowParticles = new UpdateParticles(ctrl, snow.getParticleSystem());
 
-        Iterator<Frame> rainParticleSystemParticles = rainParticleSystem.getParticles();
-        Iterator<Frame> smokeParticleSystemParticles = smokeParticleSystem.getParticles();
-        Iterator<Frame> snowParticleSystemParticles = snowParticleSystem.getParticles();
 
-        while (snowParticleSystemParticles.hasNext()/* && rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()*/) {
-            Frame rainPar = rainParticleSystemParticles.next();
-            Frame smokePar = smokeParticleSystemParticles.next();
-            Frame snowPar = snowParticleSystemParticles.next();
-            //ctrl.addSpriteToFrontBuffer(rainPar);
-            //ctrl.addSpriteToFrontBuffer(smokePar);
-            ctrl.addSpriteToFrontBuffer(snowPar);
-        }
+        // Took everything in this comment block, generalized it, and put it in UpdateParticles.java
+//        ParticleSystem rainParticleSystem = rain.getParticleSystem();
+//        ParticleSystem smokeParticleSystem = smoke.getParticleSystem();
+//        ParticleSystem snowParticleSystem = snow.getParticleSystem();
+//
+//        Iterator<Frame> rainParticleSystemParticles = rainParticleSystem.getParticles();
+//        Iterator<Frame> smokeParticleSystemParticles = smokeParticleSystem.getParticles();
+//        Iterator<Frame> snowParticleSystemParticles = snowParticleSystem.getParticles();
+//
+//        while (snowParticleSystemParticles.hasNext()/* && rainParticleSystemParticles.hasNext() && smokeParticleSystemParticles.hasNext()*/) {
+//            Frame rainPar = rainParticleSystemParticles.next();
+//            Frame smokePar = smokeParticleSystemParticles.next();
+//            Frame snowPar = snowParticleSystemParticles.next();
+//            //ctrl.addSpriteToFrontBuffer(rainPar);
+//            //ctrl.addSpriteToFrontBuffer(smokePar);
+//            ctrl.addSpriteToFrontBuffer(snowPar);
+//        }
 
     }
 
