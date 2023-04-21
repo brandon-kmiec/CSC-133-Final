@@ -3,6 +3,13 @@
 #text: text
 #text: x, y, text
 #text_hover_rect: x1, y1, x2, y2, tag, hover_label
+#load_bg: sprite_tag                                # Needs to be the very first command in the script
+#display_overlay_item: x, y, sprite_tag
+#play_music: fileName
+#play_music_loop: fileName
+#start_animation: delay, isLooping, x, y, spriteTag1, spriteTag2, ...   # Need at least 2 sprite tags
+
+load_bg: forest
 
 #text: Howdy Partner!
 text: test
@@ -14,3 +21,10 @@ show_sprite: 300, 300, cheeseBurger
 
 text_hover_rect: 300, 300, 428, 428, cheeseBurger, This is a cheeseBurger!
 text_hover_rect: 700, 100, 828, 228, tree, This is a tree!
+
+display_overlay_item: 500, 500, wheel
+
+play_music: funny_death
+
+#figure out what is wrong with displaying the animation (currentFrame gets the first frame then reads following frames as null)
+#start_animation: 50, true, 700, 500, c_idle, c_leftfoot, c_idle2, c_rightfoot

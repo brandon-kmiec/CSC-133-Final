@@ -6,6 +6,7 @@ import FileIO.EZFileRead;
 import FileIO.EZFileWrite;
 import Input.Mouse;
 import Particles.*;
+import Puzzles.PipePuzzle;
 import ScriptingEngine.Interpreter;
 import Sound.Sound;
 import logic.Control;
@@ -25,12 +26,12 @@ public class Main {
     public static Rain rain;
     public static Smoke smoke;
     public static Snow snow;
-    //    public static String s = "";
-//    public static String s2 = "";
+    public static String s = "";
+    public static String s2 = "";
     private static int[] buffer;
-    //    private static RECT disk;
-//    private static final int dropShadow = 2;
-//    private static Interpreter interpreter;
+    private static RECT disk;
+    private static final int dropShadow = 2;
+    private static Interpreter interpreter;
     public static AText aText = new AText("This is a test of text in the console box...", 20);
     public static Sound song = new Sound("persephone_farewell");
     public static Sound sfx = new Sound("funny_death");
@@ -42,6 +43,8 @@ public class Main {
     public static double scale = 1.0;
     public static boolean isScaleUp = true;
 
+    public static PipePuzzle pipePuzzle;
+
 
     public static void main(String[] args) {
         updateArtScript();
@@ -52,6 +55,8 @@ public class Main {
     /* This is your access to things BEFORE the game loop starts */
     public static void start(Control ctrl) {
         // TODO: Code your starting conditions here...NOT DRAW CALLS HERE! (no addSprite or drawString)
+
+        pipePuzzle = new PipePuzzle(ctrl);
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
@@ -96,6 +101,7 @@ public class Main {
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
 
+        pipePuzzle.drawPuzzle();
 
         //ctrl.addSpriteToFrontBuffer(0, 0, "forest");
 
@@ -156,7 +162,7 @@ public class Main {
 
         // TODO: 4/19/2023 interpreter and save
 //        interpreter.checkCommands();
-//
+
 //        Point p = Mouse.getMouseCoords();
 //        int x = (int) p.getX();
 //        int y = (int) p.getY();

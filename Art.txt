@@ -1,3 +1,5 @@
+Art/boxClickOutline.png*boxClickOutline
+Art/boxOutline.png*boxOutline
 Art/cheeseBurger.png*cheeseBurger
 Art/cursor.png*cursor
 Art/c_idle.png*c_idle
@@ -7,8 +9,13 @@ Art/c_rightfoot.png*c_rightfoot
 Art/f0.png*f0
 Art/f1.png*f1
 Art/forest.jpg*forest
+Art/gridOutlineCorner.png*gridOutlineCorner
+Art/gridOutlineEdge.png*gridOutlineEdge
 Art/gui_bg.jpg*gui_bg
 Art/my_hud.png*my_hud
+Art/pipe180Angle.png*pipe180Angle
+Art/pipe90Angle.png*pipe90Angle
+Art/pipeEnd.png*pipeEnd
 Art/raindrop1.png*raindrop1
 Art/raindrop2.png*raindrop2
 Art/raindrop3.png*raindrop3

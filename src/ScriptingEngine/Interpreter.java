@@ -1,9 +1,12 @@
 package ScriptingEngine;
 
+import Data.Animation;
 import Data.Click;
 import Data.Command;
+import Data.Frame;
 import Data.RECT;
 import Input.Mouse;
+import Sound.Sound;
 import logic.Control;
 
 import java.awt.*;
@@ -17,6 +20,9 @@ public class Interpreter {
     private static String tagStr;
     private ArrayList<Command> commands;
     private static ArrayList<Command> rectCommands;
+    private static boolean musicPlaying;
+    private static boolean animationPlaying;
+    private static Animation animation;
 
     // Constructor
     public Interpreter(Control ctrl, ArrayList<Command> commands) {
@@ -25,6 +31,8 @@ public class Interpreter {
         hoverLabelStr = "";
         tagStr = "";
         rectCommands = new ArrayList<>();
+        musicPlaying = false;
+        animationPlaying = false;
     }
 
     // Methods
@@ -38,6 +46,20 @@ public class Interpreter {
                 showTextAtCoords(c);
             else if (c.isCommand("text_hover_rect") && c.getNumParams() == 6)
                 rectCommands.add(c);
+            else if (c.isCommand("load_bg") && c.getNumParams() == 1)
+                loadBackground(c);
+            else if (c.isCommand("display_overlay_item") && c.getNumParams() == 3)
+                displayItem(c);
+            else if (c.isCommand("play_music") && c.getNumParams() == 1)
+                playMusic(c);
+            else if (c.isCommand("play_music_loop") && c.getNumParams() == 1)
+                playMusicLoop(c);
+            else if (c.isCommand("start_animation") && c.getNumParams() >= 6) {
+                int delay = Integer.parseInt(c.getParamByIndex(0));
+                boolean isLooping = Boolean.parseBoolean(c.getParamByIndex(1));
+                animation = new Animation(delay, isLooping);
+                startAnimation(c);
+            }
         }
 
         if (!rectCommands.isEmpty())
@@ -93,5 +115,82 @@ public class Interpreter {
             ctrl.drawString(x - dropShadow, (y - dropShadow) - 2, hoverLabelStr, Color.yellow);
             ctrl.drawString(150, 800, tagStr, Color.WHITE);
         }
+    }
+
+    private void loadBackground(Command c) {
+        ctrl.addSpriteToFrontBuffer(0, 0, c.getParamByIndex(0));
+    }
+
+    private void displayItem(Command c) {
+        int x = Integer.parseInt(c.getParamByIndex(0));
+        int y = Integer.parseInt(c.getParamByIndex(1));
+        String tag = c.getParamByIndex(2);
+        ctrl.addSpriteToOverlayBuffer(x, y, tag);
+    }
+
+    private void playMusic(Command c) {
+        Sound music = new Sound(c.getParamByIndex(0));
+        if (!musicPlaying) {
+            music.playWAV();
+            musicPlaying = true;
+        }
+        if (music.isFinished())
+            musicPlaying = false;
+    }
+
+    private void playMusicLoop(Command c) {
+        Sound music = new Sound(c.getParamByIndex(0));
+        if (!musicPlaying) {
+            music.setLoop();
+            musicPlaying = true;
+        }
+    }
+
+    // TODO: 4/20/2023 figure out why animation doesn't hold the frames (draws c_idle then gives null for remaining frames) 
+    private void startAnimation(Command c) {
+        int x = Integer.parseInt(c.getParamByIndex(2));
+        int y = Integer.parseInt(c.getParamByIndex(3));
+
+        String[] spriteTags = new String[c.getNumParams() - 4];
+        Frame[] frames = new Frame[c.getNumParams() - 4];
+
+
+        //Animation animation = new Animation(delay, isLooping);
+
+        if (!animationPlaying) {
+            for (int i = 0; i < spriteTags.length; i++) {
+                frames[i] = new Frame(x, y, c.getParamByIndex(i + 4));
+                spriteTags[i] = c.getParamByIndex(i + 4);
+                System.out.println(frames[i].getSpriteTag());
+            }
+            for (int i = 4; i < c.getNumParams(); i++) {
+                animation.addFrame(new Frame(x, y, spriteTags[i - 4]));
+                //System.out.println(animation.getCurrentFrame().getSpriteTag());
+                //System.out.println(c.getParamByIndex(i));
+            }
+            animationPlaying = true;
+        }
+
+        //Frame currentFrame = animation.getCurrentFrame();
+//        if (animation.getCurrentFrame() != null)
+//            ctrl.addSpriteToFrontBuffer(animation.getCurrentFrame());
+
+//        System.out.println(animation.getCurrentFrame());
+
+        for (int i = 0; i < 4; i++) {
+            Frame currentFrame = animation.getCurrentFrame();
+            if (currentFrame != null) {
+                ctrl.addSpriteToFrontBuffer(currentFrame);
+                System.out.println(currentFrame);
+            }
+        }
+
+//        if (currentFrame != null)
+
+//        if (currentFrame == null)
+//            animation.restartAnim();
+//        if (animation.isFinished()) {
+//            animation.restartAnim();
+//        }
     }
 }
