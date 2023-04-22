@@ -70,19 +70,18 @@ public class PipePuzzle {
         images[5].setLeftRight(true);
 
         Sprite[] sprites = new Sprite[6];
-        sprites[0] = new Sprite(0, 0, images[0].getImage(), "Pipe0");
-        sprites[1] = new Sprite(0, 0, images[1].getImage(), "Pipe1");
-        sprites[2] = new Sprite(0, 0, images[2].getImage(), "Pipe2");
-        sprites[3] = new Sprite(0, 0, images[3].getImage(), "Pipe3");
-        sprites[4] = new Sprite(0, 0, images[4].getImage(), "Pipe4");
-        sprites[5] = new Sprite(0, 0, images[5].getImage(), "Pipe5");
+        sprites[0] = new Sprite(0, 0, images[0].getImage(), "bottomRight");
+        sprites[1] = new Sprite(0, 0, images[1].getImage(), "bottomLeft");
+        sprites[2] = new Sprite(0, 0, images[2].getImage(), "topLeft");
+        sprites[3] = new Sprite(0, 0, images[3].getImage(), "topRight");
+        sprites[4] = new Sprite(0, 0, images[4].getImage(), "topBottom");
+        sprites[5] = new Sprite(0, 0, images[5].getImage(), "leftRight");
 
         for (int i = 0; i < pipePuzzle.length; i++) {
             for (int j = 0; j < pipePuzzle.length; j++) {
                 int x = (i << 7) + 576;
                 int y = (j << 7) + 156;
-
-                pipePuzzle[i][j] = new Sprite((i * 128), (j * 128), images[i].getImage(), sprites[i].getTag());
+                pipePuzzle[i][j] = new Sprite((i << 7), (j << 7), images[j].getImage(), sprites[j].getTag());
                 pipeRect[i][j] = new RECT(x, y, x + 128, y + 128, "pipeHover", new Frame(x, y, "boxOutline"));
             }
         }
@@ -123,10 +122,11 @@ public class PipePuzzle {
                 int x = (i << 7) + 576;
                 int y = (j << 7) + 156;
 
-                pipePuzzle[i][j].moveXAbsolute(x);
-                pipePuzzle[i][j].moveYAbsolute(y);
-                ctrl.addSpriteToFrontBuffer(pipePuzzle[i][j]);
+                pipePuzzle[j][i].moveXAbsolute(x);
+                pipePuzzle[j][i].moveYAbsolute(y);
+                ctrl.addSpriteToFrontBuffer(pipePuzzle[j][i]);
 
+                ctrl.drawString(x, (y + 16), "(" + j + ", " + i + ")", Color.white);
                 drawGridOutline(i, j, x, y);
 
                 if (pipeRect[i][j].isCollision(p.x, p.y)) {
@@ -134,25 +134,28 @@ public class PipePuzzle {
                 }
                 if (Control.getMouseInput() != null) {
                     if (pipeRect[i][j].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-                        swapList.add(pipePuzzle[i][j]);
-                        swapPoints.add(new Point(i, j));
+                        swapList.add(pipePuzzle[j][i]);
+                        swapPoints.add(new Point(j, i));
 
-                        s = "last clicked: (" + i + ", " + j + ")";
+                        s = "last clicked: (" + j + ", " + i + ")";
+                        if (!solved) {
+                            if (swapList.size() == 2)
+                                swap();
 
-                        if (swapList.size() == 2)
-                            swap();
+                            //isSolved();
+                           // s2 = "";
+                        } //else {
+                           // s2 = "Puzzle Solved!!!";
+                        //}
                     }
                 }
                 ctrl.drawString(576, 146, s, Color.white);
             }
         }
 
-        // TODO: 4/21/2023 find out why var solved never updates to true
-        //  (issue between pipePuzzle[row][column].getSprite() being a sprite and images[k].getImage() being a buffered image???)
-        //  (change pipePuzzle to DirectionBufferedImage type and change DirectionBufferedImage to use sprite instead of buffered image???)
         if (!solved) {
             isSolved();
-            s2 = "puzzle not solved";
+            s2 = "";
         } else
             s2 = "puzzle solved";
 
@@ -245,430 +248,381 @@ public class PipePuzzle {
     }
 
     private void isSolved() {
-//        int row = 5;
-//        int column = 0;
-        System.out.println(row + " " + column);
-//        DirectionBufferedImage previous = null;
-
-//        while (row != 0 && column != 5 && !solved) {
-        if (row != -1 || row != 6 || column != -1 || column != 6) {
-            if (row == 5 && column == 0) {
-                for (int k = 0; k < images.length; k++) {
-                    if (pipePuzzle[row][column].getSprite() == images[k].getImage()) {
-                        if (images[k].isLeftTop()) {
+        row = 5;
+        column = 0;
+        previous = null;
+        for (int count = 0; count < 36; count++) {
+            if (row == 0 && column == 6) {
+                solved = true;
+                break;
+            } else if (row == -1 || row == 6 || column == -1 || column == 6) {
+                row = 5;
+                column = 0;
+                break;
+            }
+            for (DirectionBufferedImage image : images) {
+                if (pipePuzzle[row][column].getSprite() == image.getImage()) {
+                    if (row == 5 && column == 0) {
+                        if (image.isLeftTop()) {
                             row--;
-                            previous = images[k];
+                            previous = image;
                             up = true;
                             down = false;
                             left = false;
                             right = false;
-                        } else if (images[k].isLeftRight()) {
+                            break;
+                        } else if (image.isLeftRight()) {
                             column++;
-                            previous = images[k];
+                            previous = image;
                             up = false;
                             down = false;
                             left = false;
                             right = true;
-                        } else if (images[k].isLeftBottom()) {
+                            break;
+                        } else if (image.isLeftBottom()) {
                             row++;
-                            previous = images[k];
+                            previous = image;
                             up = false;
                             down = true;
                             left = false;
                             right = false;
-                        }
-                    }
-                }
-            } else if (row == 0 && column == 5) {
-                for (int k = 0; k < images.length; k++) {
-                    if (pipePuzzle[row][column].getSprite() == images[k].getImage()) {
-                        if (previous.isBottomRight() && right) {
-                            if (images[k].isLeftRight())
-                                solved = true;
-                            else
-                                break;
-                        }
-                        if (previous.isLeftRight() && right) {
-                            if (images[k].isLeftRight())
-                                solved = true;
-                            else
-                                break;
-                        }
-                        if (previous.isTopBottom() && up) {
-                            if (images[k].isTopBottom())
-                                solved = true;
-                            else
-                                break;
-                        }
-                        if (previous.isLeftTop() && up) {
-                            if (images[k].isTopBottom())
-                                solved = true;
                             break;
                         }
-                    }
-                }
-            } else {
-                for (int k = 0; k < images.length; k++) {
-                    if (pipePuzzle[row][column].getSprite() == images[k].getImage()) {
-                        if (previous.isTopBottom() && up) {
-                            if (images[k].isTopBottom()) {
-                                row--;
-                                previous = images[k];
-                                up = true;
-                                down = false;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isBottomRight()) {
-                                column++;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                            if (images[k].isLeftBottom()) {
-                                column--;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                        }
-                        if (previous.isTopBottom() && down) {
-                            if (images[k].isTopBottom()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftTop()) {
-                                column--;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = true;
-                                right = false;
-                            }
-                            if (images[k].isTopRight()) {
-                                column++;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                        }
-                        if (previous.isLeftTop() && up) {
-                            if (images[k].isTopBottom()) {
-                                row--;
-                                previous = images[k];
-                                up = true;
-                                down = false;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftBottom()) {
-                                column--;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                            if (images[k].isBottomRight()) {
-                                column++;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                        }
-                        if (previous.isLeftTop() && left) {
-                            if (images[k].isBottomRight()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isTopRight()) {
-                                row--;
-                                previous = images[k];
-                                up = true;
-                                down = false;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftRight()) {
-                                column--;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = true;
-                                right = false;
-                            }
-                        }
-                        if (previous.isTopRight() && right) {
-                            if (images[k].isLeftRight()) {
-                                column++;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                            if (images[k].isLeftTop()) {
-                                row--;
-                                previous = images[k];
-                                up = true;
-                                down = false;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftBottom()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                        }
-                        if (previous.isTopRight() && up) {
-                            if (images[k].isTopBottom()) {
-                                row--;
-                                previous = images[k];
-                                up = true;
-                                down = false;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isBottomRight()) {
-                                column++;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                            if (images[k].isLeftBottom()) {
-                                column--;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                        }
+                    } else if (row == 0 && column == 5) {
                         if (previous.isBottomRight() && right) {
-                            if (images[k].isLeftRight()) {
+                            if (image.isLeftRight())
                                 column++;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = false;
-                                right = true;
-                            }
-                            if (images[k].isLeftTop()) {
+                            break;
+                        } else if (previous.isLeftRight() && right) {
+                            if (image.isLeftRight())
+                                column++;
+                            break;
+                        } else if (previous.isTopBottom() && up) {
+                            if (image.isBottomRight())
+                                column++;
+                            break;
+                        } else if (previous.isLeftTop() && up) {
+                            if (image.isBottomRight())
+                                column++;
+                            break;
+                        }
+                    } else {
+                        if (previous.isTopBottom() && up) {
+                            if (image.isTopBottom()) {
                                 row--;
-                                previous = images[k];
+                                previous = image;
                                 up = true;
                                 down = false;
                                 left = false;
                                 right = false;
-                            }
-                            if (images[k].isLeftBottom()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                        }
-                        if (previous.isBottomRight() && down) {
-                            if (images[k].isTopBottom()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftTop()) {
-                                column--;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = true;
-                                right = false;
-                            }
-                            if (images[k].isTopRight()) {
+                                break;
+                            } else if (image.isBottomRight()) {
                                 column++;
-                                previous = images[k];
+                                previous = image;
                                 up = false;
                                 down = false;
                                 left = false;
                                 right = true;
-                            }
-                        }
-                        if (previous.isLeftRight() && left) {
-                            if (images[k].isBottomRight()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isTopRight()) {
-                                row--;
-                                previous = images[k];
-                                up = true;
-                                down = false;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftRight()) {
+                                break;
+                            } else if (image.isLeftBottom()) {
                                 column--;
-                                previous = images[k];
-                                up = false;
-                                down = false;
-                                left = true;
-                                right = false;
-                            }
-                        }
-                        if (previous.isLeftRight() && right) {
-                            if (images[k].isLeftRight()) {
-                                column++;
-                                previous = images[k];
+                                previous = image;
                                 up = false;
                                 down = false;
                                 left = false;
                                 right = true;
+                                break;
                             }
-                            if (images[k].isLeftTop()) {
-                                row--;
-                                previous = images[k];
-                                up = true;
-                                down = false;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftBottom()) {
+                        } else if (previous.isTopBottom() && down) {
+                            if (image.isTopBottom()) {
                                 row++;
-                                previous = images[k];
+                                previous = image;
                                 up = false;
                                 down = true;
                                 left = false;
                                 right = false;
-                            }
-                        }
-                        if (previous.isLeftBottom() && down) {
-                            if (images[k].isTopBottom()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isLeftTop()) {
+                                break;
+                            } else if (image.isLeftTop()) {
                                 column--;
-                                previous = images[k];
+                                previous = image;
                                 up = false;
                                 down = false;
                                 left = true;
                                 right = false;
-                            }
-                            if (images[k].isTopRight()) {
+                                break;
+                            } else if (image.isTopRight()) {
                                 column++;
-                                previous = images[k];
+                                previous = image;
                                 up = false;
                                 down = false;
                                 left = false;
                                 right = true;
+                                break;
                             }
-                        }
-                        if (previous.isLeftBottom() && left) {
-                            if (images[k].isBottomRight()) {
-                                row++;
-                                previous = images[k];
-                                up = false;
-                                down = true;
-                                left = false;
-                                right = false;
-                            }
-                            if (images[k].isTopRight()) {
+                        } else if (previous.isLeftTop() && up) {
+                            if (image.isTopBottom()) {
                                 row--;
-                                previous = images[k];
+                                previous = image;
                                 up = true;
                                 down = false;
                                 left = false;
                                 right = false;
-                            }
-                            if (images[k].isLeftRight()) {
+                                break;
+                            } else if (image.isLeftBottom()) {
                                 column--;
-                                previous = images[k];
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            } else if (image.isBottomRight()) {
+                                column++;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            }
+                        } else if (previous.isLeftTop() && left) {
+                            if (image.isBottomRight()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isTopRight()) {
+                                row--;
+                                previous = image;
+                                up = true;
+                                down = false;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftRight()) {
+                                column--;
+                                previous = image;
                                 up = false;
                                 down = false;
                                 left = true;
                                 right = false;
+                                break;
+                            }
+                        } else if (previous.isTopRight() && right) {
+                            if (image.isLeftRight()) {
+                                column++;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            } else if (image.isLeftTop()) {
+                                row--;
+                                previous = image;
+                                up = true;
+                                down = false;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftBottom()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            }
+                        } else if (previous.isTopRight() && up) {
+                            if (image.isTopBottom()) {
+                                row--;
+                                previous = image;
+                                up = true;
+                                down = false;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isBottomRight()) {
+                                column++;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            } else if (image.isLeftBottom()) {
+                                column--;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            }
+                        } else if (previous.isBottomRight() && right) {
+                            if (image.isLeftRight()) {
+                                column++;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            } else if (image.isLeftTop()) {
+                                row--;
+                                previous = image;
+                                up = true;
+                                down = false;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftBottom()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            }
+                        } else if (previous.isBottomRight() && down) {
+                            if (image.isTopBottom()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftTop()) {
+                                column--;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = true;
+                                right = false;
+                                break;
+                            } else if (image.isTopRight()) {
+                                column++;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            }
+                        } else if (previous.isLeftRight() && left) {
+                            if (image.isBottomRight()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isTopRight()) {
+                                row--;
+                                previous = image;
+                                up = true;
+                                down = false;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftRight()) {
+                                column--;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = true;
+                                right = false;
+                                break;
+                            }
+                        } else if (previous.isLeftRight() && right) {
+                            if (image.isLeftRight()) {
+                                column++;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            } else if (image.isLeftTop()) {
+                                row--;
+                                previous = image;
+                                up = true;
+                                down = false;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftBottom()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            }
+                        } else if (previous.isLeftBottom() && down) {
+                            if (image.isTopBottom()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftTop()) {
+                                column--;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = true;
+                                right = false;
+                                break;
+                            } else if (image.isTopRight()) {
+                                column++;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = false;
+                                right = true;
+                                break;
+                            }
+                        } else if (previous.isLeftBottom() && left) {
+                            if (image.isBottomRight()) {
+                                row++;
+                                previous = image;
+                                up = false;
+                                down = true;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isTopRight()) {
+                                row--;
+                                previous = image;
+                                up = true;
+                                down = false;
+                                left = false;
+                                right = false;
+                                break;
+                            } else if (image.isLeftRight()) {
+                                column--;
+                                previous = image;
+                                up = false;
+                                down = false;
+                                left = true;
+                                right = false;
+                                break;
                             }
                         }
                     }
                 }
             }
         }
-
-//        while (i != 0 && j != 5 && !solved) {
-//
-//            if (i == -1 || i == 6 || j == -1 || j == 6)
-//                break;
-//
-//            if (i == 5 && j == 0) {
-//                for (int k = 0; k < images.length; k++) {
-//                    if (pipePuzzle[i][j].getSprite() == images[k].getImage() && images[k].isLeft()) {
-//                        if (images[k].isTop()) {
-//                            i--;
-//                            for (int x = 0; x < images.length; x++) {
-//                                if (pipePuzzle[i][j].getSprite() == images[x].getImage() && images[x].isBottom())
-//
-//                            }
-//                        }
-//                        if (images[k].isBottom())
-//                            break;  // might need to fix possible issue not being able to swap sprites
-//                        if (images[k].isRight()) {
-//                            j++;
-//                            break;
-//                        }
-//                    }
-//                }
-//            } else if (i == 0 && j == 5) {
-//
-//            } else {
-//                for (int k = 0; k < images.length; k++) {
-//                    if (pipePuzzle[i][j].getSprite() == images[k].getImage() && images[k].isLeft()) {
-//                        if (images[k].isTop())
-//                            i--;
-//                        if (images[k].isBottom())
-//                            i++;
-//                        if (images[k].isRight())
-//                            j++;
-//                    }
-//                    if (pipePuzzle[i][j].getSprite() == images)
-//                }
-//
-//            }
-//
-//
-//        }
     }
 }
-

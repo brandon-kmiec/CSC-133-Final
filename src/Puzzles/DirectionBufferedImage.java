@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 public class DirectionBufferedImage {
     // Fields
-    private BufferedImage image;
+    private final BufferedImage image;
     private boolean up, down, left, right;     // Directions
     private boolean bottomRight, topRight, topBottom, leftBottom, leftTop, leftRight;   // Connections
 
