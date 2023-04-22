@@ -15,13 +15,13 @@ import java.util.ArrayList;
 
 public class PipePuzzle {
     // Fields
-    private Control ctrl;
-    private static Sprite[][] pipePuzzle = new Sprite[6][6];
-    private static RECT[][] pipeRect = new RECT[6][6];
-    private static ArrayList<Sprite> swapList = new ArrayList<>();
-    private static ArrayList<Point> swapPoints = new ArrayList<>();
+    private final Control ctrl;
+    private static final Sprite[][] pipePuzzle = new Sprite[6][6];
+    private static final RECT[][] pipeRect = new RECT[6][6];
+    private static final ArrayList<Sprite> swapList = new ArrayList<>();
+    private static final ArrayList<Point> swapPoints = new ArrayList<>();
     private static boolean solved;
-    private static DirectionBufferedImage[] images = new DirectionBufferedImage[6];
+    private static final DirectionBufferedImage[] images = new DirectionBufferedImage[6];
     private static boolean up, down, left, right;
     private static String s, s2;
     private static int row, column;
@@ -138,15 +138,9 @@ public class PipePuzzle {
                         swapPoints.add(new Point(j, i));
 
                         s = "last clicked: (" + j + ", " + i + ")";
-                        if (!solved) {
+                        if (!solved)
                             if (swapList.size() == 2)
                                 swap();
-
-                            //isSolved();
-                           // s2 = "";
-                        } //else {
-                           // s2 = "Puzzle Solved!!!";
-                        //}
                     }
                 }
                 ctrl.drawString(576, 146, s, Color.white);

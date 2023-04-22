@@ -5,16 +5,11 @@ import java.awt.image.BufferedImage;
 public class DirectionBufferedImage {
     // Fields
     private final BufferedImage image;
-    private boolean up, down, left, right;     // Directions
-    private boolean bottomRight, topRight, topBottom, leftBottom, leftTop, leftRight;   // Connections
+    private boolean bottomRight, topRight, topBottom, leftBottom, leftTop, leftRight;
 
     // Constructor
     public DirectionBufferedImage(BufferedImage image) {
         this.image = image;
-        up = false;
-        down = false;
-        left = false;
-        right = false;
 
         bottomRight = false;
         topRight = false;
@@ -25,38 +20,6 @@ public class DirectionBufferedImage {
     }
 
     // Methods
-    public boolean isUp() {
-        return up;
-    }
-
-    public void setUp(boolean up) {
-        this.up = up;
-    }
-
-    public boolean isDown() {
-        return down;
-    }
-
-    public void setDown(boolean bottom) {
-        this.down = bottom;
-    }
-
-    public boolean isLeft() {
-        return left;
-    }
-
-    public void setLeft(boolean left) {
-        this.left = left;
-    }
-
-    public boolean isRight() {
-        return right;
-    }
-
-    public void setRight(boolean right) {
-        this.right = right;
-    }
-
     public BufferedImage getImage() {
         return image;
     }
