@@ -153,7 +153,7 @@ public class PipePuzzle {
         } else
             s2 = "puzzle solved";
 
-        ctrl.drawString(576, 126, s2, Color.white);
+        ctrl.drawString(576, 116, s2, Color.white);
     }
 
     private void drawGridOutline(int i, int j, int x, int y) {
