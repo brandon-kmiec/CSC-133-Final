@@ -1,10 +1,7 @@
 package ScriptingEngine;
 
-import Data.Animation;
-import Data.Click;
-import Data.Command;
+import Data.*;
 import Data.Frame;
-import Data.RECT;
 import Input.Mouse;
 import Sound.Sound;
 import logic.Control;
@@ -21,8 +18,8 @@ public class Interpreter {
     private ArrayList<Command> commands;
     private static ArrayList<Command> rectCommands;
     private static boolean musicPlaying;
-    private static boolean animationPlaying;
-    private static Animation animation;
+    private boolean animationPlaying;
+    private Animation animation;
 
     // Constructor
     public Interpreter(Control ctrl, ArrayList<Command> commands) {
@@ -57,7 +54,17 @@ public class Interpreter {
             else if (c.isCommand("start_animation") && c.getNumParams() >= 6) {
                 int delay = Integer.parseInt(c.getParamByIndex(0));
                 boolean isLooping = Boolean.parseBoolean(c.getParamByIndex(1));
-                animation = new Animation(delay, isLooping);
+                int x = Integer.parseInt(c.getParamByIndex(2));
+                int y = Integer.parseInt(c.getParamByIndex(3));
+
+                if (!animationPlaying) {
+                    animation = new Animation(delay, isLooping);
+
+                    for (int i = 4; i < c.getNumParams(); i++)
+                        animation.addFrame(new Frame(x, y, c.getParamByIndex(i)));
+
+                    animationPlaying = true;
+                }
                 startAnimation(c);
             }
         }
@@ -146,51 +153,11 @@ public class Interpreter {
         }
     }
 
-    // TODO: 4/20/2023 figure out why animation doesn't hold the frames (draws c_idle then gives null for remaining frames) 
     private void startAnimation(Command c) {
-        int x = Integer.parseInt(c.getParamByIndex(2));
-        int y = Integer.parseInt(c.getParamByIndex(3));
-
-        String[] spriteTags = new String[c.getNumParams() - 4];
-        Frame[] frames = new Frame[c.getNumParams() - 4];
-
-
-        //Animation animation = new Animation(delay, isLooping);
-
-        if (!animationPlaying) {
-            for (int i = 0; i < spriteTags.length; i++) {
-                frames[i] = new Frame(x, y, c.getParamByIndex(i + 4));
-                spriteTags[i] = c.getParamByIndex(i + 4);
-                System.out.println(frames[i].getSpriteTag());
-            }
-            for (int i = 4; i < c.getNumParams(); i++) {
-                animation.addFrame(new Frame(x, y, spriteTags[i - 4]));
-                //System.out.println(animation.getCurrentFrame().getSpriteTag());
-                //System.out.println(c.getParamByIndex(i));
-            }
-            animationPlaying = true;
+        if (animationPlaying) {
+            Frame curFrame = animation.getCurrentFrame();
+            if (curFrame != null)
+                ctrl.addSpriteToFrontBuffer(curFrame);
         }
-
-        //Frame currentFrame = animation.getCurrentFrame();
-//        if (animation.getCurrentFrame() != null)
-//            ctrl.addSpriteToFrontBuffer(animation.getCurrentFrame());
-
-//        System.out.println(animation.getCurrentFrame());
-
-        for (int i = 0; i < 4; i++) {
-            Frame currentFrame = animation.getCurrentFrame();
-            if (currentFrame != null) {
-                ctrl.addSpriteToFrontBuffer(currentFrame);
-                System.out.println(currentFrame);
-            }
-        }
-
-//        if (currentFrame != null)
-
-//        if (currentFrame == null)
-//            animation.restartAnim();
-//        if (animation.isFinished()) {
-//            animation.restartAnim();
-//        }
     }
 }

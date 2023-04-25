@@ -20,17 +20,17 @@ public class PipePuzzle {
     private static final RECT[][] pipeRect = new RECT[6][6];
     private static final ArrayList<Sprite> swapList = new ArrayList<>();
     private static final ArrayList<Point> swapPoints = new ArrayList<>();
-    private static boolean solved;
+    private boolean solved, puzzleActive, exitPuzzle;
     private static final DirectionBufferedImage[] images = new DirectionBufferedImage[6];
     private static boolean up, down, left, right;
-    private static String s, s2;
+    private static String s;
     private static int row, column;
     private static DirectionBufferedImage previous;
+    private static RECT puzzleSolvedRect;
 
     // Constructor
     public PipePuzzle(Control ctrl) {
         s = "last clicked: ";
-        s2 = "";
 
         row = 5;
         column = 0;
@@ -39,11 +39,15 @@ public class PipePuzzle {
         this.ctrl = ctrl;
 
         solved = false;
+        puzzleActive = false;
+        exitPuzzle = false;
 
         up = false;
         down = false;
         left = false;
         right = false;
+
+        puzzleSolvedRect = new RECT(832, 412, 1088, 668, "puzzleSolvedRect");
 
         images[0] = new DirectionBufferedImage(Graphic.rotateImageByDegrees(
                 ctrl.getSpriteFromBackBuffer("pipe90Angle").getSprite(), 0.0));
@@ -91,6 +95,22 @@ public class PipePuzzle {
     }
 
     // Methods
+    public boolean isPuzzleSolved() {
+        return solved;
+    }
+
+    public boolean isExitPuzzle() {
+        return exitPuzzle;
+    }
+
+    public boolean isPuzzleActive() {
+        return puzzleActive;
+    }
+
+    public void setPuzzleActive(boolean puzzleActive) {
+        this.puzzleActive = puzzleActive;
+    }
+
     private static void randomizeBoard() {
         Sprite temp;
         for (int i = 0; i < pipePuzzle.length; i++) {
@@ -126,7 +146,7 @@ public class PipePuzzle {
                 pipePuzzle[j][i].moveYAbsolute(y);
                 ctrl.addSpriteToFrontBuffer(pipePuzzle[j][i]);
 
-                ctrl.drawString(x, (y + 16), "(" + j + ", " + i + ")", Color.white);
+//                ctrl.drawString(x, (y + 16), "(" + j + ", " + i + ")", Color.white);
                 drawGridOutline(i, j, x, y);
 
                 if (pipeRect[i][j].isCollision(p.x, p.y)) {
@@ -149,11 +169,12 @@ public class PipePuzzle {
 
         if (!solved) {
             isSolved();
-            s2 = "";
-        } else
-            s2 = "puzzle solved";
-
-        ctrl.drawString(576, 116, s2, Color.white);
+        } else {
+            ctrl.addSpriteToFrontBuffer(832, 412, "puzzleSolved");
+            if (Control.getMouseInput() != null)
+                if (puzzleSolvedRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON))
+                    exitPuzzle = true;
+        }
     }
 
     private void drawGridOutline(int i, int j, int x, int y) {

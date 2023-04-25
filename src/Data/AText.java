@@ -2,6 +2,10 @@ package Data;
 
 import timer.stopWatchX;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class AText {
     // Fields
     private String srcStr;      // The string to print
@@ -42,5 +46,33 @@ public class AText {
         destStr = "";
         cursor = 0;
         timer.resetWatch();
+    }
+
+    public void changeStr(String newStr) {
+        this.srcStr = newStr;
+    }
+
+    public ArrayList<String> wrapText(String raw, int n) {
+        String[] words = raw.split(" ");
+        ArrayList<String> lines = new ArrayList<>();
+        int count = 0;
+        String current = "";
+        Queue<String > q = new LinkedList<>();
+        for (String word : words)
+            q.add(word);
+
+        while (q.peek() != null) {
+            if (q.peek().length() + count < n){
+                current += q.poll() + " ";
+                count += current.length();
+            } else {
+                lines.add(current);
+                current = "";
+                count = 0;
+            }
+        }
+        lines.add(current);
+
+        return lines;
     }
 }

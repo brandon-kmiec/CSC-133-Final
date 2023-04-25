@@ -26,5 +26,4 @@ display_overlay_item: 500, 500, wheel
 
 play_music: funny_death
 
-#figure out what is wrong with displaying the animation (currentFrame gets the first frame then reads following frames as null)
-#start_animation: 50, true, 700, 500, c_idle, c_leftfoot, c_idle2, c_rightfoot
+start_animation: 500, true, 700, 500, c_idle, c_leftfoot, c_idle2, c_rightfoot

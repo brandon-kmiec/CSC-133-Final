@@ -5,6 +5,9 @@ import Data.Frame;
 import FileIO.EZFileRead;
 import FileIO.EZFileWrite;
 import Input.Mouse;
+import Inventory.Inventory;
+import Levels.Level1;
+import Levels.TitleScreen;
 import Particles.*;
 import Puzzles.PipePuzzle;
 import ScriptingEngine.Interpreter;
@@ -44,6 +47,10 @@ public class Main {
     public static boolean isScaleUp = true;
 
     public static PipePuzzle pipePuzzle;
+    public static Level1 level1;
+    public static TitleScreen titleScreen;
+
+    public static Inventory inventory;
 
 
     public static void main(String[] args) {
@@ -56,13 +63,20 @@ public class Main {
     public static void start(Control ctrl) {
         // TODO: Code your starting conditions here...NOT DRAW CALLS HERE! (no addSprite or drawString)
 
+        inventory = new Inventory(ctrl);
+
         pipePuzzle = new PipePuzzle(ctrl);
+        level1 = new Level1(ctrl, inventory);
+        level1.setLevelActive(true);
+        titleScreen = new TitleScreen(ctrl);
+        titleScreen.setLevelActive(true);
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
         snow = new Snow(-50, 0, 1350, 90, 50, 250, 150);
 
-        //ctrl.hideDefaultCursor();
+
+//        ctrl.hideDefaultCursor();
 
         // TODO: 4/19/2023 Affine Transform
 //        BufferedImage wheel = ctrl.getSpriteFromBackBuffer("wheel").getSprite();
@@ -101,9 +115,29 @@ public class Main {
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
 
-        pipePuzzle.drawPuzzle();
+        if (titleScreen.isLevelActive()){
+            titleScreen.runLevel();
+            if (titleScreen.isStartClicked()){
+                titleScreen.setLevelActive(false);
+                level1.setLevelActive(true);
+            }
+        } else if (level1.isLevelActive()) {
+            level1.runLevel();
+            if (level1.isNextLevel()){
+                level1.setLevelActive(false);
+                // TODO: 4/25/2023 level2.setLevelActive(true); 
+            }
+        }
 
-        //ctrl.addSpriteToFrontBuffer(0, 0, "forest");
+        inventory.drawInventory();
+
+
+//        for (int i = 0; i < 5; i++) {
+//            int x1 = (i << 7) + 800;
+//            ctrl.addSpriteToHudBuffer(new Sprite(x1, 900, ctrl.getSpriteFromBackBuffer("inventorySlot").getSprite(), "test"));
+//        }
+
+//        ctrl.addSpriteToFrontBuffer(0, 0, "forest");
 
         // TODO: 4/19/2023 Affine Transform
 //        if (timer1.isTimeUp()) {
@@ -142,7 +176,7 @@ public class Main {
         // TODO: 4/19/2023 particles
         //UpdateParticles rainParticles = new UpdateParticles(ctrl, rain.getParticleSystem());
         //UpdateParticles smokeParticles = new UpdateParticles(ctrl, smoke.getParticleSystem());
-        //UpdateParticles snowParticles = new UpdateParticles(ctrl, snow.getParticleSystem());
+//        UpdateParticles snowParticles = new UpdateParticles(ctrl, snow.getParticleSystem());
 
 
         // TODO: 4/19/2023 HUD

@@ -116,6 +116,11 @@ public class Control {
         s.moveYAbsolute(y);
         hudBuffer.addSprite(s);
     }
+
+    public void addSpriteToHudBuffer(Sprite spr) {
+        hudBuffer.addSprite(spr);
+    }
+
     // add other addSpriteToHudBuffer methods that receive frame or sprite (similar to addSpriteToFrontBuffer methods)???
 
     public void addSpriteToOverlayBuffer(int x, int y, String spriteTag) {
