@@ -29,6 +29,7 @@ public class Main {
     public static Rain rain;
     public static Smoke smoke;
     public static Snow snow;
+    public static Firework firework;
     public static String s = "";
     public static String s2 = "";
     private static int[] buffer;
@@ -46,7 +47,6 @@ public class Main {
     public static double scale = 1.0;
     public static boolean isScaleUp = true;
 
-    public static PipePuzzle pipePuzzle;
     public static Level1 level1;
     public static TitleScreen titleScreen;
 
@@ -65,15 +65,15 @@ public class Main {
 
         inventory = new Inventory(ctrl);
 
-        pipePuzzle = new PipePuzzle(ctrl);
-        level1 = new Level1(ctrl, inventory);
-        level1.setLevelActive(true);
         titleScreen = new TitleScreen(ctrl);
         titleScreen.setLevelActive(true);
+        level1 = new Level1(ctrl, inventory);
+
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
         snow = new Snow(-50, 0, 1350, 90, 50, 250, 150);
+        firework = new Firework(200, 1000, 1720, 100, 25, 75, 5);
 
 
 //        ctrl.hideDefaultCursor();
@@ -115,21 +115,56 @@ public class Main {
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
 
-        if (titleScreen.isLevelActive()){
+        if (!titleScreen.isLevelActive() /* && !finishScreen.isLevelActive()*/)
+            inventory.drawInventory();
+        if (titleScreen.isLevelActive()) {
             titleScreen.runLevel();
-            if (titleScreen.isStartClicked()){
+            if (titleScreen.isStartClicked()) {
                 titleScreen.setLevelActive(false);
                 level1.setLevelActive(true);
             }
         } else if (level1.isLevelActive()) {
             level1.runLevel();
-            if (level1.isNextLevel()){
+            if (level1.isNextLevel()) {
                 level1.setLevelActive(false);
-                // TODO: 4/25/2023 level2.setLevelActive(true); 
+//                level2.setLevelActive(true);
             }
         }
-
-        inventory.drawInventory();
+//        else if (level2.isLevelActive()) {
+//            level2.runLevel();
+//            if (level2.isNextLevel()){
+//                level2.setLevelActive(false);
+//                level3.setLevelActive(true);
+//            }
+//            if (level2.isPrevLevel()){
+//                level2.setLevelActive(false);
+//                level1.setLevelActive(true);
+//            }
+//        }
+//        else if (level3.isLevelActive()) {
+//            level3.runLevel();
+//            if (level3.isNextLevel()){
+//                level3.setLevelActive(false);
+//                finishScreen.setLevelActive(true);
+//            }
+//            if (level3.isPrevLevel()){
+//                level3.setLevelActive(false);
+//                level2.setLevelActive(true);
+//            }
+//        }
+//        else if (finishScreen.isLevelActive()) {
+//            finishScreen.runLevel();
+//            if (finishScreen.restartClicked()){
+//                  finishScreen.setLevelActive(false);
+//                  inventory = new Inventory(ctrl);
+//                  titleScreen = new TitleScreen(ctrl);
+//                  titleScreen.setLevelActive(true);
+//                  level1 = new Level1(ctrl, inventory);
+//                  level2 = new Level2(ctrl, inventory);
+//                  level3 = new Level3(ctrl, inventory);
+//                  finishScreen = new Level1(ctrl);
+//            }
+//        }
 
 
 //        for (int i = 0; i < 5; i++) {
@@ -174,9 +209,15 @@ public class Main {
 
 
         // TODO: 4/19/2023 particles
-        //UpdateParticles rainParticles = new UpdateParticles(ctrl, rain.getParticleSystem());
-        //UpdateParticles smokeParticles = new UpdateParticles(ctrl, smoke.getParticleSystem());
-//        UpdateParticles snowParticles = new UpdateParticles(ctrl, snow.getParticleSystem());
+        //UpdateParticles rainParticles = new UpdateParticles(ctrl, true, rain.getParticleSystem());
+        //UpdateParticles smokeParticles = new UpdateParticles(ctrl, true, smoke.getParticleSystem());
+//        UpdateParticles snowParticles = new UpdateParticles(ctrl, true, snow.getParticleSystem());
+
+        // TODO: 4/26/2023 Firework Particles
+//        UpdateParticles fireworkParticles = new UpdateParticles(ctrl, true, firework.getParticleSystem());
+//        for (int i = 0; i < firework.explosions.length; i++)
+//            if (firework.explosions[i] != null)
+//                new UpdateParticles(ctrl, false, firework.explosions[i].getParticleSystem());
 
 
         // TODO: 4/19/2023 HUD

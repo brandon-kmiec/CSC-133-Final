@@ -58,6 +58,8 @@ public class Particle {
         return rootX;
     }
 
+    public void changeRootX(int newRootX) {this.rootX = newRootX;}
+
     public int getY() {
         return y;
     }
@@ -104,6 +106,21 @@ public class Particle {
                 isReset = true;
             }
             timer.resetWatch();
+        }
+        return new Frame(x, y, particleSpriteTag);
+    }
+
+    public Frame getCurrentFrameNoReset() {
+        if (timer.isTimeUp()) {
+            age++;
+            x += xMove;
+            y += yMove;
+            timer.resetWatch();
+            if (isParticleDead()) {
+                x = -50;
+                y = -50;
+                age = lifeCycle;
+            }
         }
         return new Frame(x, y, particleSpriteTag);
     }

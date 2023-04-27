@@ -81,14 +81,13 @@ public class PipePuzzle {
         sprites[4] = new Sprite(0, 0, images[4].getImage(), "topBottom");
         sprites[5] = new Sprite(0, 0, images[5].getImage(), "leftRight");
 
-        for (int i = 0; i < pipePuzzle.length; i++) {
+        for (int i = 0; i < pipePuzzle.length; i++)
             for (int j = 0; j < pipePuzzle.length; j++) {
                 int x = (i << 7) + 576;
                 int y = (j << 7) + 156;
                 pipePuzzle[i][j] = new Sprite((i << 7), (j << 7), images[j].getImage(), sprites[j].getTag());
                 pipeRect[i][j] = new RECT(x, y, x + 128, y + 128, "pipeHover", new Frame(x, y, "boxOutline"));
             }
-        }
 
         for (int i = 0; i < 3; i++)
             randomizeBoard();
@@ -113,7 +112,7 @@ public class PipePuzzle {
 
     private static void randomizeBoard() {
         Sprite temp;
-        for (int i = 0; i < pipePuzzle.length; i++) {
+        for (int i = 0; i < pipePuzzle.length; i++)
             for (int j = 0; j < pipePuzzle.length; j++) {
                 int r = Particle.rollDie(6) - 1;
                 int c = Particle.rollDie(6) - 1;
@@ -122,7 +121,6 @@ public class PipePuzzle {
                 pipePuzzle[i][j] = pipePuzzle[r][c];
                 pipePuzzle[r][c] = temp;
             }
-        }
     }
 
     public void drawPuzzle() {
@@ -136,8 +134,7 @@ public class PipePuzzle {
         ctrl.addSpriteToFrontBuffer(pipeStart);
         ctrl.addSpriteToFrontBuffer(pipeEnd);
 
-
-        for (int i = 0; i < pipePuzzle.length; i++) {
+        for (int i = 0; i < pipePuzzle.length; i++)
             for (int j = 0; j < pipePuzzle.length; j++) {
                 int x = (i << 7) + 576;
                 int y = (j << 7) + 156;
@@ -149,10 +146,9 @@ public class PipePuzzle {
 //                ctrl.drawString(x, (y + 16), "(" + j + ", " + i + ")", Color.white);
                 drawGridOutline(i, j, x, y);
 
-                if (pipeRect[i][j].isCollision(p.x, p.y)) {
+                if (pipeRect[i][j].isCollision(p.x, p.y))
                     ctrl.addSpriteToFrontBuffer(pipeRect[i][j].getGraphicalHover());
-                }
-                if (Control.getMouseInput() != null) {
+                if (Control.getMouseInput() != null)
                     if (pipeRect[i][j].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
                         swapList.add(pipePuzzle[j][i]);
                         swapPoints.add(new Point(j, i));
@@ -162,14 +158,12 @@ public class PipePuzzle {
                             if (swapList.size() == 2)
                                 swap();
                     }
-                }
                 ctrl.drawString(576, 146, s, Color.white);
             }
-        }
 
-        if (!solved) {
+        if (!solved)
             isSolved();
-        } else {
+        else {
             ctrl.addSpriteToFrontBuffer(832, 412, "puzzleSolved");
             if (Control.getMouseInput() != null)
                 if (puzzleSolvedRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON))
@@ -216,7 +210,6 @@ public class PipePuzzle {
             Sprite tempSprite = new Sprite(gridEdge);
             tempSprite.moveYAbsolute(y + 4);
             ctrl.addSpriteToFrontBuffer(tempSprite);
-
         }
         if (i == 5 && j > 0 && j < 5) {
             BufferedImage temp = Graphic.rotateImageByDegrees(
@@ -227,7 +220,6 @@ public class PipePuzzle {
             Sprite tempSprite = new Sprite(gridEdge);
             tempSprite.moveYAbsolute(y + 4);
             ctrl.addSpriteToFrontBuffer(tempSprite);
-
         }
         if (j == 0 && i > 0 && i < 5) {
             BufferedImage temp = Graphic.rotateImageByDegrees(
@@ -238,7 +230,6 @@ public class PipePuzzle {
             Sprite tempSprite = new Sprite(gridEdge);
             tempSprite.moveXAbsolute(x + 4);
             ctrl.addSpriteToFrontBuffer(tempSprite);
-
         }
         if (j == 5 && i > 0 && i < 5) {
             BufferedImage temp = Graphic.rotateImageByDegrees(
@@ -249,7 +240,6 @@ public class PipePuzzle {
             Sprite tempSprite = new Sprite(gridEdge);
             tempSprite.moveXAbsolute(x + 4);
             ctrl.addSpriteToFrontBuffer(tempSprite);
-
         }
     }
 
@@ -344,8 +334,8 @@ public class PipePuzzle {
                                 previous = image;
                                 up = false;
                                 down = false;
-                                left = false;
-                                right = true;
+                                left = true;
+                                right = false;
                                 break;
                             }
                         } else if (previous.isTopBottom() && down) {
@@ -388,8 +378,8 @@ public class PipePuzzle {
                                 previous = image;
                                 up = false;
                                 down = false;
-                                left = false;
-                                right = true;
+                                left = true;
+                                right = false;
                                 break;
                             } else if (image.isBottomRight()) {
                                 column++;
@@ -474,8 +464,8 @@ public class PipePuzzle {
                                 previous = image;
                                 up = false;
                                 down = false;
-                                left = false;
-                                right = true;
+                                left = true;
+                                right = false;
                                 break;
                             }
                         } else if (previous.isBottomRight() && right) {

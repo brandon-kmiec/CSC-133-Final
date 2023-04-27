@@ -8,6 +8,13 @@ Art/c_leftfoot.png*c_leftfoot
 Art/c_rightfoot.png*c_rightfoot
 Art/f0.png*f0
 Art/f1.png*f1
+Art/firework1.png*firework1
+Art/firework2.png*firework2
+Art/firework3.png*firework3
+Art/firework4.png*firework4
+Art/firework5.png*firework5
+Art/firework6.png*firework6
+Art/fireworkRocket.png*fireworkRocket
 Art/forest.jpg*forest
 Art/gridOutlineCorner.png*gridOutlineCorner
 Art/gridOutlineEdge.png*gridOutlineEdge

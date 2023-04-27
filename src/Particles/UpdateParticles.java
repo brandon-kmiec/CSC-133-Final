@@ -11,17 +11,30 @@ public class UpdateParticles {
     private final Control ctrl;
 
     // Constructor
-    public UpdateParticles(Control ctrl, ParticleSystem particleSystem) {
+    public UpdateParticles(Control ctrl, boolean reset, ParticleSystem particleSystem) {
         this.ctrl = ctrl;
         this.particleSystem = particleSystem;
-        update();
+
+        if (reset)
+            update();
+        else
+            updateNoReset();
     }
 
     // Methods
-    private void update(){
+    private void update() {
         Iterator<Frame> particleSystemParticles = particleSystem.getParticles();
 
-        while (particleSystemParticles.hasNext()){
+        while (particleSystemParticles.hasNext()) {
+            Frame particles = particleSystemParticles.next();
+            ctrl.addSpriteToFrontBuffer(particles);
+        }
+    }
+
+    private void updateNoReset() {
+        Iterator<Frame> particleSystemParticles = particleSystem.getParticlesNoReset();
+
+        while (particleSystemParticles.hasNext()) {
             Frame particles = particleSystemParticles.next();
             ctrl.addSpriteToFrontBuffer(particles);
         }

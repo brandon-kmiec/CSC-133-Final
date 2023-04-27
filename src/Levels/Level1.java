@@ -12,12 +12,10 @@ import java.util.ArrayList;
 
 public class Level1 {
     // Fields
-    private Levels firstLevel;
-
     private final Control ctrl;
     private final RECT nextLevelDoor;
     private final RECT puzzle;
-    private final RECT itemRect;
+    private RECT itemRect;
     private final Sprite puzzleSprite;
     private final Sprite textBox;
     private final Sprite backgroundSprite;
@@ -27,43 +25,48 @@ public class Level1 {
     private String doorDialog;
     private String puzzleDialog;
     private String itemHoverLabel;
+    private String inventoryHoverLabel;
     private final Frame closedDoor;
     private final Animation doorOpen;
     private boolean levelActive;
     private boolean startAnim;
     private boolean holdingItem;
     private boolean nextLevel;
+    private boolean inInventory;
     private final PipePuzzle pipePuzzle;
     private final AText aText;
     private final ArrayList<AText> aTextList;
     private ArrayList<String> wrap;
-
-    private final Inventory inventory;
+    private final RECT[] inventorySlots;
 
     // Constructor
     public Level1(Control ctrl, Inventory inventory) {
         this.ctrl = ctrl;
-        this.inventory = inventory;
+
+        inventorySlots = inventory.getInventorySlots();
 
         levelActive = false;
         startAnim = false;
         holdingItem = false;
         nextLevel = false;
+        inInventory = false;
 
         aText = new AText("", 20);
         aTextList = new ArrayList<>();
         wrap = new ArrayList<>();
 
-        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level1Background").getSprite(), "background");
-        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(), "textBox");
+        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level1Background").getSprite(),
+                "background");
+        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
+                "textBox");
 
-        puzzleSprite = new Sprite(320, 160, ctrl.getSpriteFromBackBuffer("puzzleSprite").getSprite(), "puzzle");
+        puzzleSprite = new Sprite(320, 160, ctrl.getSpriteFromBackBuffer("puzzleSprite").getSprite(),
+                "puzzle");
         puzzle = new RECT(puzzleSprite.getX(), puzzleSprite.getY(), puzzleSprite.getX() + 128,
-                puzzleSprite.getY() + 128, "puzzleRect", "Click to attempt to solve the puzzle");
+                puzzleSprite.getY() + 128, "puzzleRect", "Puzzle");
 
         itemSprite = new Sprite(1700, 500, ctrl.getSpriteFromBackBuffer("key").getSprite(), "key");
-        itemRect = new RECT(-50, -50, -50, -50, "key", "key");
-
+        itemRect = new RECT(-50, -50, -50, -50, "key", "Key");
 
         closedDoor = new Frame(830, 0, "level1Door1");
 
@@ -81,14 +84,27 @@ public class Level1 {
         puzzleDialog = "";
         puzzleHoverLabel = "";
         itemHoverLabel = "";
+        inventoryHoverLabel = "";
 
         nextLevelDoor = new RECT(860, 46, 1197, 435, "nextLevel", doorHoverLabel);
-        // TODO: 4/23/2023 display "door to next level" when hovered over.  When clicked, say "puzzle not solved" if puzzle is not solved.
-        //  When clicked and puzzle solved, say "find an item to open the door" if clicked without proper item.
-        //  When clicked with proper item and puzzle solved, activate animation and allow player to go to next room.
     }
 
     // Methods
+    public void runLevel() {
+        if (pipePuzzle.isPuzzleSolved() && pipePuzzle.isExitPuzzle())
+            pipePuzzle.setPuzzleActive(false);
+        if (pipePuzzle.isPuzzleActive())
+            pipePuzzle.drawPuzzle();
+        else {
+            if (levelActive) {
+                drawSprites();
+                checkCollision();
+                checkClicked();
+            }
+            drawAnimatedText();
+        }
+    }
+
     public void setLevelActive(boolean isActive) {
         this.levelActive = isActive;
     }
@@ -101,51 +117,29 @@ public class Level1 {
         return nextLevel;
     }
 
-    public boolean isHoldingItem() {
-        return holdingItem;
-    }
-
-    public void runLevel() {
-
-        if (pipePuzzle.isPuzzleSolved() && pipePuzzle.isExitPuzzle())
-            pipePuzzle.setPuzzleActive(false);
-        if (pipePuzzle.isPuzzleActive())
-            pipePuzzle.drawPuzzle();
-        else {
-            if (isLevelActive()) {
-                drawSprites();
-
-                checkCollision();
-
-                checkClicked();
-            }
-            drawAnimatedText();
-        }
-    }
-
     private void drawSprites() {
         Point p = Mouse.getMouseCoords();
 
-        if (startAnim) {
+        if (startAnim)
             doorAnimation();
-        } else {
+        else
             ctrl.addSpriteToFrontBuffer(closedDoor);
-        }
 
         ctrl.addSpriteToFrontBuffer(backgroundSprite);
         ctrl.addSpriteToFrontBuffer(textBox);
 
         ctrl.addSpriteToFrontBuffer(puzzleSprite);
 
-        if (pipePuzzle.isPuzzleSolved() && !holdingItem && !startAnim) {
-            // TODO: 4/24/2023 spawn an item that can be clicked
+        if (pipePuzzle.isPuzzleSolved() && !holdingItem && !startAnim && !inInventory) {
             ctrl.addSpriteToFrontBuffer(itemSprite);
-            itemRect.changeLocation(1700, 516, 1827, 549);
-        }
-        if (pipePuzzle.isPuzzleSolved() && holdingItem) {
+            itemRect = new RECT(itemSprite.getX(), 516, 1764, 548, itemRect.getTag(),
+                    itemRect.getHoverLabel());
+        } else if (pipePuzzle.isPuzzleSolved() && inInventory)
+            ctrl.addSpriteToHudBuffer(itemSprite);
+        else if (pipePuzzle.isPuzzleSolved() && holdingItem) {
             itemSprite.moveXAbsolute(p.x);
             itemSprite.moveYAbsolute(p.y);
-            ctrl.addSpriteToFrontBuffer(itemSprite);
+            ctrl.addSpriteToHudBuffer(itemSprite);
         }
     }
 
@@ -160,31 +154,43 @@ public class Level1 {
     private void checkCollision() {
         Point p = Mouse.getMouseCoords();
 
-        if (puzzle.isCollision(p.x, p.y) && pipePuzzle.isPuzzleSolved()) {
-            puzzleHoverLabel = "The Puzzle has been solved";
-        } else if (puzzle.isCollision(p.x, p.y)) {
+        if (puzzle.isCollision(p.x, p.y))
             puzzleHoverLabel = puzzle.getHoverLabel();
-        } else
+        else
             puzzleHoverLabel = "";
         ctrl.drawString(p.x, (p.y - 2), puzzleHoverLabel, Color.BLACK);
         ctrl.drawString((p.x - 2), (p.y - 2) - 2, puzzleHoverLabel, Color.YELLOW);
 
         if (nextLevelDoor.isCollision(p.x, p.y) && startAnim) {
             ctrl.addSpriteToOverlayBuffer(p.x - 32, p.y - 16, "moveLevelCursor");
-            doorHoverLabel = "Open Door";
-        } else if (nextLevelDoor.isCollision(p.x, p.y)) {
+            doorHoverLabel = "Next Level";
+        } else if (nextLevelDoor.isCollision(p.x, p.y))
             doorHoverLabel = "Closed Door";
-        } else
+        else
             doorHoverLabel = "";
         ctrl.drawString(p.x, (p.y - 2), doorHoverLabel, Color.BLACK);
         ctrl.drawString((p.x - 2), (p.y - 2) - 2, doorHoverLabel, Color.YELLOW);
 
-        if (itemRect.isCollision(p.x, p.y)) {
-            itemHoverLabel = itemRect.getHoverLabel() + "(Send to inventory)";
-        } else
+        if (itemRect.isCollision(p.x, p.y))
+            itemHoverLabel = itemRect.getHoverLabel();
+        else
             itemHoverLabel = "";
-        ctrl.drawString(p.x, (p.y - 2), itemHoverLabel, Color.BLACK);
-        ctrl.drawString((p.x - 2), (p.y - 2) - 2, itemHoverLabel, Color.YELLOW);
+        for (RECT inventorySlot : inventorySlots) {
+            if (inventorySlot.isCollision(p.x, p.y) && inInventory) {
+                itemHoverLabel = inventorySlot.getHoverLabel();
+                inventoryHoverLabel = "";
+                break;
+            } else if (inventorySlot.isCollision(p.x, p.y) && !inInventory) {
+                itemHoverLabel = "";
+                inventoryHoverLabel = inventorySlot.getHoverLabel();
+                break;
+            } else
+                inventoryHoverLabel = "";
+        }
+        ctrl.drawHudString(p.x, (p.y - 2), itemHoverLabel, Color.BLACK);
+        ctrl.drawHudString((p.x - 2), (p.y - 2) - 2, itemHoverLabel, Color.YELLOW);
+        ctrl.drawHudString(p.x, (p.y - 2), inventoryHoverLabel, Color.BLACK);
+        ctrl.drawHudString((p.x - 2), (p.y - 2) - 2, inventoryHoverLabel, Color.YELLOW);
     }
 
     private void checkClicked() {
@@ -203,15 +209,14 @@ public class Level1 {
                     wrap = aText.wrapText(doorDialog, 200);
                 } else if (pipePuzzle.isPuzzleSolved() && holdingItem) {
                     startAnim = true;
-                    // TODO: 4/24/2023 change cursor back to game cursor (do not put item back in inventory)
+
                     doorDialog = "";
 
                     aTextList.clear();
                     wrap = aText.wrapText(doorDialog, 200);
                     holdingItem = false;
-                } else if (pipePuzzle.isPuzzleSolved() && startAnim) {
+                } else if (pipePuzzle.isPuzzleSolved() && startAnim)
                     nextLevel = true;
-                }
             }
             if (puzzle.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
                 if (!pipePuzzle.isPuzzleSolved())
@@ -223,19 +228,24 @@ public class Level1 {
                     wrap = aText.wrapText(puzzleDialog, 200);
                 }
             }
-            if (itemRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) &&
-                    !inventory.inInventory(itemSprite.getX(), itemSprite.getY())) {
-
-                itemSprite.moveXAbsolute(1184);
-                itemSprite.moveYAbsolute(900);
-
-                itemRect.changeLocation(1184, 916, 1311, 949);
-//                holdingItem = true;
-                // TODO: 4/24/2023 change itemRect to be at the inventory location of item
-                // TODO: 4/24/2023 change absolute x and y of item sprite to the location in the inventory
-            } else if (itemRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) &&
-                    inventory.inInventory(itemSprite.getX(), itemSprite.getY())) {
+            if (itemRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && !holdingItem) {
                 holdingItem = true;
+                itemRect = new RECT(-50, -50, -50, -50, itemRect.getTag(), itemRect.getHoverLabel());
+            }
+            for (int i = 0; i < inventorySlots.length; i++) {
+                if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && holdingItem) {
+                    inInventory = true;
+                    holdingItem = false;
+
+                    RECT clickedRect = inventorySlots[i];
+                    itemSprite.moveXAbsolute(clickedRect.getX1() + 32);
+                    itemSprite.moveYAbsolute(clickedRect.getY1() + 32);
+                    inventorySlots[i].changeHoverLabel(itemRect.getTag());
+                } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory) {
+                    holdingItem = true;
+                    inInventory = false;
+                    inventorySlots[i].changeHoverLabel("Inventory Slot" + (i + 1));
+                }
             }
         }
     }
