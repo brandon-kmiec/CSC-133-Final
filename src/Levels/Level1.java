@@ -6,6 +6,7 @@ import Input.Mouse;
 import Inventory.Inventory;
 import Puzzles.PipePuzzle;
 import logic.Control;
+import Graphics.Graphic;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Level1 {
     private final Sprite textBox;
     private final Sprite backgroundSprite;
     private final Sprite itemSprite;
+    private final Sprite mouseCursor;
     private String doorHoverLabel;
     private String puzzleHoverLabel;
     private String doorDialog;
@@ -33,6 +35,8 @@ public class Level1 {
     private boolean holdingItem;
     private boolean nextLevel;
     private boolean inInventory;
+    private boolean changeMouse;
+    private boolean puzzleActive;
     private final PipePuzzle pipePuzzle;
     private final AText aText;
     private final ArrayList<AText> aTextList;
@@ -50,6 +54,8 @@ public class Level1 {
         holdingItem = false;
         nextLevel = false;
         inInventory = false;
+        changeMouse = false;
+        puzzleActive = false;
 
         aText = new AText("", 20);
         aTextList = new ArrayList<>();
@@ -68,6 +74,9 @@ public class Level1 {
         itemSprite = new Sprite(1700, 500, ctrl.getSpriteFromBackBuffer("key").getSprite(), "key");
         itemRect = new RECT(-50, -50, -50, -50, "key", "Key");
 
+        mouseCursor = new Sprite(0, 0, Graphic.rotateImageByDegrees(
+                ctrl.getSpriteFromBackBuffer("moveLevelCursor").getSprite(), -45), "mouseCursor");
+
         closedDoor = new Frame(830, 0, "level1Door1");
 
         doorOpen = new Animation(500, false);
@@ -77,7 +86,7 @@ public class Level1 {
         doorOpen.addFrame(new Frame(830, 0, "level1Door4"));
         doorOpen.addFrame(new Frame(830, 30, "level1Door5"));
 
-        pipePuzzle = new PipePuzzle(ctrl);
+        pipePuzzle = new PipePuzzle(ctrl, mouseCursor);
 
         doorHoverLabel = "";
         doorDialog = "";
@@ -91,11 +100,14 @@ public class Level1 {
 
     // Methods
     public void runLevel() {
-        if (pipePuzzle.isPuzzleSolved() && pipePuzzle.isExitPuzzle())
+        if (pipePuzzle.isPuzzleSolved() && pipePuzzle.isExitPuzzle()) {
             pipePuzzle.setPuzzleActive(false);
-        if (pipePuzzle.isPuzzleActive())
+            puzzleActive = false;
+        }
+        if (PipePuzzle.isPuzzleActive()) {
+            puzzleActive = true;
             pipePuzzle.drawPuzzle();
-        else {
+        } else {
             if (levelActive) {
                 drawSprites();
                 checkCollision();
@@ -103,6 +115,10 @@ public class Level1 {
             }
             drawAnimatedText();
         }
+    }
+
+    public boolean isPuzzleActive() {
+        return puzzleActive;
     }
 
     public void setLevelActive(boolean isActive) {
@@ -141,6 +157,14 @@ public class Level1 {
             itemSprite.moveYAbsolute(p.y);
             ctrl.addSpriteToHudBuffer(itemSprite);
         }
+
+        if (changeMouse) {
+            ctrl.addSpriteToOverlayBuffer(p.x - 32, p.y - 16, "moveLevelCursor");
+        } else {
+            mouseCursor.moveXAbsolute(p.x - 16);
+            mouseCursor.moveYAbsolute(p.y - 18);
+            ctrl.addSpriteToOverlayBuffer(mouseCursor);
+        }
     }
 
     private void drawAnimatedText() {
@@ -162,12 +186,15 @@ public class Level1 {
         ctrl.drawString((p.x - 2), (p.y - 2) - 2, puzzleHoverLabel, Color.YELLOW);
 
         if (nextLevelDoor.isCollision(p.x, p.y) && startAnim) {
-            ctrl.addSpriteToOverlayBuffer(p.x - 32, p.y - 16, "moveLevelCursor");
+            changeMouse = true;
             doorHoverLabel = "Next Level";
-        } else if (nextLevelDoor.isCollision(p.x, p.y))
+        } else if (nextLevelDoor.isCollision(p.x, p.y)) {
             doorHoverLabel = "Closed Door";
-        else
+            changeMouse = false;
+        } else {
             doorHoverLabel = "";
+            changeMouse = false;
+        }
         ctrl.drawString(p.x, (p.y - 2), doorHoverLabel, Color.BLACK);
         ctrl.drawString((p.x - 2), (p.y - 2) - 2, doorHoverLabel, Color.YELLOW);
 
@@ -175,7 +202,7 @@ public class Level1 {
             itemHoverLabel = itemRect.getHoverLabel();
         else
             itemHoverLabel = "";
-        for (RECT inventorySlot : inventorySlots) {
+        for (RECT inventorySlot : inventorySlots)
             if (inventorySlot.isCollision(p.x, p.y) && inInventory) {
                 itemHoverLabel = inventorySlot.getHoverLabel();
                 inventoryHoverLabel = "";
@@ -186,7 +213,6 @@ public class Level1 {
                 break;
             } else
                 inventoryHoverLabel = "";
-        }
         ctrl.drawHudString(p.x, (p.y - 2), itemHoverLabel, Color.BLACK);
         ctrl.drawHudString((p.x - 2), (p.y - 2) - 2, itemHoverLabel, Color.YELLOW);
         ctrl.drawHudString(p.x, (p.y - 2), inventoryHoverLabel, Color.BLACK);
@@ -198,7 +224,6 @@ public class Level1 {
             if (nextLevelDoor.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
                 if (!pipePuzzle.isPuzzleSolved()) {
                     doorDialog = "The puzzle has not yet been solved. Try solving the puzzle to open the door.";
-
                     aTextList.clear();
                     wrap = aText.wrapText(doorDialog, 183);
                 } else if (pipePuzzle.isPuzzleSolved() && !holdingItem && !startAnim) {
@@ -244,7 +269,7 @@ public class Level1 {
                 } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory) {
                     holdingItem = true;
                     inInventory = false;
-                    inventorySlots[i].changeHoverLabel("Inventory Slot" + (i + 1));
+                    inventorySlots[i].changeHoverLabel("Inventory Slot #" + (i + 1));
                 }
             }
         }

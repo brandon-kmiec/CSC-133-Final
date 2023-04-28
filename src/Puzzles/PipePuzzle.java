@@ -20,16 +20,21 @@ public class PipePuzzle {
     private static final RECT[][] pipeRect = new RECT[6][6];
     private static final ArrayList<Sprite> swapList = new ArrayList<>();
     private static final ArrayList<Point> swapPoints = new ArrayList<>();
-    private boolean solved, puzzleActive, exitPuzzle;
-    private static final DirectionBufferedImage[] images = new DirectionBufferedImage[6];
+    private boolean solved;
+    private static boolean puzzleActive;
+    private boolean exitPuzzle;
     private static boolean up, down, left, right;
+    private static final DirectionBufferedImage[] images = new DirectionBufferedImage[6];
     private static String s;
     private static int row, column;
     private static DirectionBufferedImage previous;
     private static RECT puzzleSolvedRect;
+    private final Sprite mouseCursor;
 
     // Constructor
-    public PipePuzzle(Control ctrl) {
+    public PipePuzzle(Control ctrl, Sprite mouseCursor) {
+        this.mouseCursor = mouseCursor;
+
         s = "last clicked: ";
 
         row = 5;
@@ -102,7 +107,7 @@ public class PipePuzzle {
         return exitPuzzle;
     }
 
-    public boolean isPuzzleActive() {
+    public static boolean isPuzzleActive() {
         return puzzleActive;
     }
 
@@ -125,6 +130,10 @@ public class PipePuzzle {
 
     public void drawPuzzle() {
         Point p = Mouse.getMouseCoords();
+
+        mouseCursor.moveXAbsolute(p.x - 16);
+        mouseCursor.moveYAbsolute(p.y - 18);
+        ctrl.addSpriteToOverlayBuffer(mouseCursor);
 
         Sprite pipeStart = new Sprite(448, 796, Graphic.rotateImageByDegrees(
                 ctrl.getSpriteFromBackBuffer("pipeEnd").getSprite(), 0.0), "start");

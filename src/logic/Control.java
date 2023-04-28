@@ -130,6 +130,8 @@ public class Control {
         overlaybuffer.addSprite(s);
     }
 
+    public void addSpriteToOverlayBuffer(Sprite spr) {overlaybuffer.addSprite(spr);}
+
     // WARNING! DO NOT MODIFY THE CODE HERE! THIS IS HERE TO GET THE GAME LIBRARY TO WORK!
     private void loadArtIntoBackBuffer() {
         EZFileRead ezr = new EZFileRead("Art.txt");

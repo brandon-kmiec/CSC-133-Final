@@ -30,10 +30,13 @@ public class Main {
     public static Smoke smoke;
     public static Snow snow;
     public static Firework firework;
+
     public static String s = "";
     public static String s2 = "";
     private static int[] buffer;
     private static RECT disk;
+    private static RECT load;
+
     private static final int dropShadow = 2;
     private static Interpreter interpreter;
     public static AText aText = new AText("This is a test of text in the console box...", 20);
@@ -62,21 +65,19 @@ public class Main {
     /* This is your access to things BEFORE the game loop starts */
     public static void start(Control ctrl) {
         // TODO: Code your starting conditions here...NOT DRAW CALLS HERE! (no addSprite or drawString)
-
         inventory = new Inventory(ctrl);
 
         titleScreen = new TitleScreen(ctrl);
         titleScreen.setLevelActive(true);
         level1 = new Level1(ctrl, inventory);
 
-
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
         snow = new Snow(-50, 0, 1350, 90, 50, 250, 150);
         firework = new Firework(200, 1000, 1720, 100, 25, 75, 5);
 
+        ctrl.hideDefaultCursor();
 
-//        ctrl.hideDefaultCursor();
 
         // TODO: 4/19/2023 Affine Transform
 //        BufferedImage wheel = ctrl.getSpriteFromBackBuffer("wheel").getSprite();
@@ -101,12 +102,15 @@ public class Main {
 //            }
 //        }
 //
-//        disk = new RECT(101, 52, 162, 112, "savetag", "Save Game");
-//        buffer = new int[40];
-//        for (int i = 0; i < buffer.length; i++) {
-//            int value = (int) (Math.random() * 100);
-//            buffer[i] = value;
-//        }
+        disk = new RECT(100, 50, 164, 114, "savetag", "Save Game",
+                new Frame(100, 50, "saveIcon2Hover"));
+        load = new RECT(200, 50, 264, 114, "loadtag", "Load Game",
+                new Frame(200, 50, "loadIconHover"));
+        buffer = new int[40];
+        for (int i = 0; i < buffer.length; i++) {
+            int value = (int) (Math.random() * 100);
+            buffer[i] = value;
+        }
 //
 //        interpreter = new Interpreter(ctrl, commands);
     }
@@ -115,7 +119,7 @@ public class Main {
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
 
-        if (!titleScreen.isLevelActive() /* && !finishScreen.isLevelActive()*/)
+        if (!titleScreen.isLevelActive() && !level1.isPuzzleActive()/* && !finishScreen.isLevelActive()*/)
             inventory.drawInventory();
         if (titleScreen.isLevelActive()) {
             titleScreen.runLevel();
@@ -162,7 +166,7 @@ public class Main {
 //                  level1 = new Level1(ctrl, inventory);
 //                  level2 = new Level2(ctrl, inventory);
 //                  level3 = new Level3(ctrl, inventory);
-//                  finishScreen = new Level1(ctrl);
+//                  finishScreen = new FinishScreen(ctrl);
 //            }
 //        }
 
@@ -238,25 +242,48 @@ public class Main {
         // TODO: 4/19/2023 interpreter and save
 //        interpreter.checkCommands();
 
-//        Point p = Mouse.getMouseCoords();
-//        int x = (int) p.getX();
-//        int y = (int) p.getY();
-//
-//        ctrl.addSpriteToFrontBuffer(100, 50, "saveicon");
-//
-//        if (disk.isCollision(x, y))
-//            s = disk.getHoverLabel();
-//        else
-//            s = "";
-//
-//        ctrl.drawString(x, (y - 2), s, Color.BLACK);
-//        ctrl.drawString(x - dropShadow, (y - dropShadow) - 2, s, Color.yellow);
-//        if (Control.getMouseInput() != null)
-//            if (disk.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-//                saveData();
-//                s2 = "Game Saved";
-//            }
-//        ctrl.drawString(0, 200, s2, Color.WHITE);
+        Point p = Mouse.getMouseCoords();
+        int x = (int) p.getX();
+        int y = (int) p.getY();
+
+        if (!titleScreen.isLevelActive()) {
+            ctrl.addSpriteToFrontBuffer(100, 50, "saveIcon2");
+
+            if (disk.isCollision(x, y)) {
+                s = disk.getHoverLabel();
+                ctrl.addSpriteToFrontBuffer(disk.getX1(), disk.getY1(), disk.getGraphicalHover().getSpriteTag());
+            }
+            else
+                s = "";
+
+            ctrl.drawString(x, (y - 2), s, Color.BLACK);
+            ctrl.drawString(x - dropShadow, (y - dropShadow) - 2, s, Color.yellow);
+            if (Control.getMouseInput() != null)
+                if (disk.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+                    saveData();
+                    s2 = "Game Saved";
+                } else
+                    s2 = "";
+        } else {
+            ctrl.addSpriteToFrontBuffer(200, 50, "loadIcon");
+
+            if (load.isCollision(x, y)) {
+                s = load.getHoverLabel();
+                ctrl.addSpriteToFrontBuffer(load.getX1(), load.getY1(), load.getGraphicalHover().getSpriteTag());
+            }
+            else
+                s = "";
+
+            ctrl.drawString(x, (y - 2), s, Color.BLACK);
+            ctrl.drawString(x - dropShadow, (y - dropShadow) - 2, s, Color.yellow);
+            if (Control.getMouseInput() != null)
+                if (load.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+                    loadData();
+                    s2 = "Game Loaded";
+                } else
+                    s2 = "";
+        }
+        ctrl.drawString(0, 200, s2, Color.WHITE);
     }
 
     // Additional Static methods below...(if needed)

@@ -2,8 +2,10 @@ package Levels;
 
 import Data.Click;
 import Data.RECT;
+import Data.Sprite;
 import Input.Mouse;
 import logic.Control;
+import Graphics.Graphic;
 
 import java.awt.*;
 
@@ -16,11 +18,15 @@ public class TitleScreen {
     private final RECT startRect;
     private final RECT leaderboardRect;
     private String hoverText;
+    private final Sprite mouseCursor;
 
     // Constructor
     public TitleScreen(Control ctrl) {
         this.ctrl = ctrl;
         levelActive = false;
+
+        mouseCursor = new Sprite(0, 0, Graphic.rotateImageByDegrees(
+                ctrl.getSpriteFromBackBuffer("moveLevelCursor").getSprite(), -45), "mouseCursor");
 
         startRect = new RECT(131, 681, 876, 839, "start");
         leaderboardRect = new RECT(968, 682, 1844, 841, "leaderboard");
@@ -47,6 +53,10 @@ public class TitleScreen {
         Point p = Mouse.getMouseCoords();
 
         ctrl.addSpriteToFrontBuffer(0, 0, "titleScreen");
+
+        mouseCursor.moveXAbsolute(p.x - 16);
+        mouseCursor.moveYAbsolute(p.y - 18);
+        ctrl.addSpriteToOverlayBuffer(mouseCursor);
 
         if (startRect.isCollision(p.x, p.y))
             hoverText = "Click to Start";
