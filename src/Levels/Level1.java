@@ -37,6 +37,7 @@ public class Level1 {
     private boolean inInventory;
     private boolean changeMouse;
     private boolean puzzleActive;
+    private boolean complete;
     private final PipePuzzle pipePuzzle;
     private final AText aText;
     private final ArrayList<AText> aTextList;
@@ -56,6 +57,7 @@ public class Level1 {
         inInventory = false;
         changeMouse = false;
         puzzleActive = false;
+        complete = false;
 
         aText = new AText("", 20);
         aTextList = new ArrayList<>();
@@ -133,11 +135,21 @@ public class Level1 {
         return nextLevel;
     }
 
+    public void setNextLevel(boolean nextLevel) {
+        this.nextLevel = nextLevel;
+    }
+
+    public boolean isComplete() {
+        return complete;
+    }
+
     private void drawSprites() {
         Point p = Mouse.getMouseCoords();
 
-        if (startAnim)
+        if (startAnim) {
             doorAnimation();
+            complete = true;
+        }
         else
             ctrl.addSpriteToFrontBuffer(closedDoor);
 

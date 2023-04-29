@@ -17,10 +17,10 @@ public class Inventory {
     public Inventory(Control ctrl) {
         this.ctrl = ctrl;
         for (int i = 0; i < rects.length; i++) {
-            int x1 = (i << 7) + 800;
-            int x2 = (i << 7) + 928;
-            rects[i] = new RECT(x1, 930, x2, 1058, "slot" + i + 1, "Inventory Slot #" + (i + 1));
-            inventorySlots[i] = new Sprite(x1, 930, ctrl.getSpriteFromBackBuffer("inventorySlot").getSprite(), "inventory" + i);
+            int x1 = (i << 7) + 1000;
+            int x2 = (i << 7) + 1128;
+            rects[i] = new RECT(x1, 886, x2, 1014, "slot" + i + 1, "Inventory Slot #" + (i + 1));
+            inventorySlots[i] = new Sprite(x1, 886, ctrl.getSpriteFromBackBuffer("inventorySlot").getSprite(), "inventory" + i);
         }
     }
 

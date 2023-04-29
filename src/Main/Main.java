@@ -7,9 +7,11 @@ import FileIO.EZFileWrite;
 import Input.Mouse;
 import Inventory.Inventory;
 import Levels.Level1;
+import Levels.Level2;
 import Levels.TitleScreen;
 import Particles.*;
 import Puzzles.PipePuzzle;
+import Puzzles.SimonSays;
 import ScriptingEngine.Interpreter;
 import Sound.Sound;
 import logic.Control;
@@ -50,8 +52,12 @@ public class Main {
     public static double scale = 1.0;
     public static boolean isScaleUp = true;
 
-    public static Level1 level1;
     public static TitleScreen titleScreen;
+    public static Level1 level1;
+    public static Level2 level2;
+
+    public static Sprite nextLevel, prevLevel;
+    public static RECT nextLevelRect, prevLevelRect;
 
     public static Inventory inventory;
 
@@ -70,14 +76,21 @@ public class Main {
         titleScreen = new TitleScreen(ctrl);
         titleScreen.setLevelActive(true);
         level1 = new Level1(ctrl, inventory);
+        level2 = new Level2(ctrl, inventory);
+//        level2.setLevelActive(true);
+
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
         snow = new Snow(-50, 0, 1350, 90, 50, 250, 150);
         firework = new Firework(200, 1000, 1720, 100, 25, 75, 5);
 
-        ctrl.hideDefaultCursor();
+//        ctrl.hideDefaultCursor();
 
+        nextLevel = new Sprite(1700, 800, ctrl.getSpriteFromBackBuffer("nextLevel").getSprite(), "nextLevel");
+        nextLevelRect = new RECT(1700, 800, 1828, 928, "next Level", new Frame(1700, 800, "nextLevelHover"));
+        prevLevel = new Sprite(1700, 928, ctrl.getSpriteFromBackBuffer("prevLevel").getSprite(), "prevLevel");
+        prevLevelRect = new RECT(1700, 928, 1828, 1056, "previous Level", new Frame(1700, 928, "prevLevelHover"));
 
         // TODO: 4/19/2023 Affine Transform
 //        BufferedImage wheel = ctrl.getSpriteFromBackBuffer("wheel").getSprite();
@@ -102,7 +115,7 @@ public class Main {
 //            }
 //        }
 //
-        disk = new RECT(100, 50, 164, 114, "savetag", "Save Game",
+        disk = new RECT(50, 50, 114, 114, "savetag", "Save Game",
                 new Frame(100, 50, "saveIcon2Hover"));
         load = new RECT(200, 50, 264, 114, "loadtag", "Load Game",
                 new Frame(200, 50, "loadIconHover"));
@@ -118,9 +131,26 @@ public class Main {
     /* This is your access to the "game loop" (It is a "callback" method from the Control class (do NOT modify that class!))*/
     public static void update(Control ctrl) {
         // TODO: This is where you can code! (Starting code below is just to show you how it works)
+        Point p = Mouse.getMouseCoords();
+        int x = (int) p.getX();
+        int y = (int) p.getY();
 
-        if (!titleScreen.isLevelActive() && !level1.isPuzzleActive()/* && !finishScreen.isLevelActive()*/)
+        if (!titleScreen.isLevelActive() && !level1.isPuzzleActive() && !level2.isPuzzleActive()/* && !finishScreen.isLevelActive()*/) {
             inventory.drawInventory();
+
+//            if (!level3.isLevelActive()) {
+            ctrl.addSpriteToHudBuffer(nextLevel);
+
+            if (nextLevelRect.isCollision(x, y))
+                ctrl.addSpriteToHudBuffer(nextLevelRect.getGraphicalHover());
+//        }
+            if (!level1.isLevelActive()) {
+                ctrl.addSpriteToHudBuffer(prevLevel);
+
+                if (prevLevelRect.isCollision(x, y))
+                    ctrl.addSpriteToHudBuffer(prevLevelRect.getGraphicalHover());
+            }
+        }
         if (titleScreen.isLevelActive()) {
             titleScreen.runLevel();
             if (titleScreen.isStartClicked()) {
@@ -131,29 +161,49 @@ public class Main {
             level1.runLevel();
             if (level1.isNextLevel()) {
                 level1.setLevelActive(false);
-//                level2.setLevelActive(true);
+                level2.setLevelActive(true);
+                level1.setNextLevel(false);
+            }
+
+            if (Control.getMouseInput() != null) {
+                if (nextLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && level1.isComplete()) {
+                    level1.setLevelActive(false);
+                    level2.setLevelActive(true);
+                    level1.setNextLevel(false);
+                }
+            }
+        } else if (level2.isLevelActive()) {
+            level2.runLevel();
+            if (level2.isNextLevel()) {
+                level2.setLevelActive(false);
+//                level3.setLevelActive(true);
+                level2.setNextLevel(false);
+            }
+
+            if (Control.getMouseInput() != null) {
+                if (nextLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && level2.isComplete()) {
+                    level2.setLevelActive(false);
+//                    level3.setLevelActive(true);
+                    level2.setNextLevel(false);
+                }
+                if (prevLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+                    level2.setLevelActive(false);
+                    level1.setLevelActive(true);
+                }
             }
         }
-//        else if (level2.isLevelActive()) {
-//            level2.runLevel();
-//            if (level2.isNextLevel()){
-//                level2.setLevelActive(false);
-//                level3.setLevelActive(true);
-//            }
-//            if (level2.isPrevLevel()){
-//                level2.setLevelActive(false);
-//                level1.setLevelActive(true);
-//            }
-//        }
 //        else if (level3.isLevelActive()) {
 //            level3.runLevel();
 //            if (level3.isNextLevel()){
 //                level3.setLevelActive(false);
 //                finishScreen.setLevelActive(true);
 //            }
-//            if (level3.isPrevLevel()){
-//                level3.setLevelActive(false);
-//                level2.setLevelActive(true);
+
+//           if (Control.getMouseInput() != null) {
+//                if (prevLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+//                    level3.setLevelActive(false);
+//                    level2.setLevelActive(true);
+//                }
 //            }
 //        }
 //        else if (finishScreen.isLevelActive()) {
@@ -242,18 +292,14 @@ public class Main {
         // TODO: 4/19/2023 interpreter and save
 //        interpreter.checkCommands();
 
-        Point p = Mouse.getMouseCoords();
-        int x = (int) p.getX();
-        int y = (int) p.getY();
 
         if (!titleScreen.isLevelActive()) {
-            ctrl.addSpriteToFrontBuffer(100, 50, "saveIcon2");
+            ctrl.addSpriteToFrontBuffer(50, 50, "saveIcon2");
 
             if (disk.isCollision(x, y)) {
                 s = disk.getHoverLabel();
                 ctrl.addSpriteToFrontBuffer(disk.getX1(), disk.getY1(), disk.getGraphicalHover().getSpriteTag());
-            }
-            else
+            } else
                 s = "";
 
             ctrl.drawString(x, (y - 2), s, Color.BLACK);
@@ -270,8 +316,7 @@ public class Main {
             if (load.isCollision(x, y)) {
                 s = load.getHoverLabel();
                 ctrl.addSpriteToFrontBuffer(load.getX1(), load.getY1(), load.getGraphicalHover().getSpriteTag());
-            }
-            else
+            } else
                 s = "";
 
             ctrl.drawString(x, (y - 2), s, Color.BLACK);

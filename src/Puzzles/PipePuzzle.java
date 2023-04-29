@@ -112,7 +112,7 @@ public class PipePuzzle {
     }
 
     public void setPuzzleActive(boolean puzzleActive) {
-        this.puzzleActive = puzzleActive;
+        PipePuzzle.puzzleActive = puzzleActive;
     }
 
     private static void randomizeBoard() {

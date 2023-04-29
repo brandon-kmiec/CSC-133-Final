@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -102,11 +103,8 @@ public class Control {
     }
 
     public void addSpriteToFrontBuffer(Frame frame) {
-//        Sprite s = backbuffer.getSpriteByTag(frame.getSpriteTag());
         Sprite s = new Sprite(frame.getX(), frame.getY(), getSpriteFromBackBuffer(frame.getSpriteTag()).getSprite(),
                 frame.getSpriteTag());
-//        s.moveXAbsolute(frame.getX());
-//        s.moveYAbsolute(frame.getY());
         frontbuffer.addSprite(s);
     }
 
@@ -121,6 +119,12 @@ public class Control {
         hudBuffer.addSprite(spr);
     }
 
+    public void addSpriteToHudBuffer(Frame frame) {
+        Sprite s = new Sprite(frame.getX(), frame.getY(), getSpriteFromBackBuffer(frame.getSpriteTag()).getSprite(),
+                frame.getSpriteTag());
+        hudBuffer.addSprite(s);
+    }
+
     // add other addSpriteToHudBuffer methods that receive frame or sprite (similar to addSpriteToFrontBuffer methods)???
 
     public void addSpriteToOverlayBuffer(int x, int y, String spriteTag) {
@@ -130,7 +134,9 @@ public class Control {
         overlaybuffer.addSprite(s);
     }
 
-    public void addSpriteToOverlayBuffer(Sprite spr) {overlaybuffer.addSprite(spr);}
+    public void addSpriteToOverlayBuffer(Sprite spr) {
+        overlaybuffer.addSprite(spr);
+    }
 
     // WARNING! DO NOT MODIFY THE CODE HERE! THIS IS HERE TO GET THE GAME LIBRARY TO WORK!
     private void loadArtIntoBackBuffer() {
@@ -143,6 +149,14 @@ public class Control {
             backbuffer.addSprite(new Sprite(0, 0, file, tag));
         }
     }
+
+    // load art into backbuffer from sprite sheet
+//    private void loadArtIntoBackBuffer() {
+//        backbuffer.addSprite(new Sprite(0,0, "Art/spriteSheet.png", "spriteSheet"));
+//
+//        // backbuffer.addSprite(spriteSheet subimage at x, y coords with subimage width, height)
+//        // get largest images first, then move down a size ... (512x512, 256x256, 128x128, 64x64, ...)
+//    }
 
     // WARNING! DO NOT MODIFY THE CODE HERE! THIS IS HERE TO GET THE GAME LIBRARY TO WORK!
     private void setupFont() {
