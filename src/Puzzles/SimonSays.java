@@ -56,9 +56,10 @@ public class SimonSays {
 
         randomizeSequence();
 
-        sequenceAnim.addFrame(new Frame(500, 500, sequence.get(0)));
+
         for (int i = 0; i < sequence.size(); i++) {
             int x = (i << 7) + 500;
+            sequenceAnim.addFrame(new Frame(x, 500, sequence.get(i)));
             sequenceAnim.addFrame(new Frame(x, 500, sequence.get(i)));
         }
     }

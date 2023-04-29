@@ -135,18 +135,17 @@ public class Main {
         int x = (int) p.getX();
         int y = (int) p.getY();
 
-        if (!titleScreen.isLevelActive() && !level1.isPuzzleActive() && !level2.isPuzzleActive()/* && !finishScreen.isLevelActive()*/) {
+        if (!titleScreen.isLevelActive() && !level1.isPuzzleActive() && !level2.isPuzzleActive()/*
+        && !level3.isPuzzleActive && !finishScreen.isLevelActive()*/) {
             inventory.drawInventory();
 
 //            if (!level3.isLevelActive()) {
             ctrl.addSpriteToHudBuffer(nextLevel);
-
             if (nextLevelRect.isCollision(x, y))
                 ctrl.addSpriteToHudBuffer(nextLevelRect.getGraphicalHover());
 //        }
             if (!level1.isLevelActive()) {
                 ctrl.addSpriteToHudBuffer(prevLevel);
-
                 if (prevLevelRect.isCollision(x, y))
                     ctrl.addSpriteToHudBuffer(prevLevelRect.getGraphicalHover());
             }
