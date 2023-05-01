@@ -9,6 +9,7 @@ import logic.Control;
 import Graphics.Graphic;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Level1 {
@@ -108,7 +109,16 @@ public class Level1 {
         }
         if (PipePuzzle.isPuzzleActive()) {
             puzzleActive = true;
-            pipePuzzle.drawPuzzle();
+
+            BufferedImage levelBackground = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+            Graphics g = levelBackground.getGraphics();
+            drawSprites();
+            g.setColor(new Color(0, 0, 0, 200));
+            g.fillRect(0, 0, 1920, 1080);
+            g.dispose();
+            Sprite sprite = new Sprite(0, 0, levelBackground, "level1Background");
+
+            pipePuzzle.drawPuzzle(sprite);
         } else {
             if (levelActive) {
                 drawSprites();

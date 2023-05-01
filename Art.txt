@@ -1,5 +1,6 @@
 Art/blue.png*blue
 Art/blueHover.png*blueHover
+Art/boat.png*boat
 Art/boulder.png*boulder
 Art/boxClickOutline.png*boxClickOutline
 Art/boxOutline.png*boxOutline

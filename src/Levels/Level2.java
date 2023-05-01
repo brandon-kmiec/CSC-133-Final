@@ -9,6 +9,7 @@ import Puzzles.SimonSays;
 import logic.Control;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Level2 {
@@ -106,7 +107,16 @@ public class Level2 {
         }
         if (simonSays.isPuzzleActive()) {
             puzzleActive = true;
-            simonSays.drawSequence();
+
+            BufferedImage levelBackground = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+            Graphics g = levelBackground.getGraphics();
+            drawSprites();
+            g.setColor(new Color(0, 0, 0, 200));
+            g.fillRect(0, 0, 1920, 1080);
+            g.dispose();
+            Sprite sprite = new Sprite(0, 0, levelBackground, "level1Background");
+
+            simonSays.drawSequence(sprite);
         } else {
             if (levelActive) {
                 drawSprites();

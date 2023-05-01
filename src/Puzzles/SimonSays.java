@@ -86,7 +86,9 @@ public class SimonSays {
             sequence.add(colors[Particle.rollDie(colors.length) - 1].getTag());
     }
 
-    public void drawSequence() {
+    public void drawSequence(Sprite sprite) {
+        ctrl.addSpriteToFrontBuffer(sprite);
+
         Point p = Mouse.getMouseCoords();
 
         mouseCursor.moveXAbsolute(p.x - 16);

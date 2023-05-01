@@ -6,9 +6,7 @@ import FileIO.EZFileRead;
 import FileIO.EZFileWrite;
 import Input.Mouse;
 import Inventory.Inventory;
-import Levels.Level1;
-import Levels.Level2;
-import Levels.TitleScreen;
+import Levels.*;
 import Particles.*;
 import Puzzles.PipePuzzle;
 import Puzzles.SimonSays;
@@ -22,7 +20,14 @@ import Graphics.Graphic;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
@@ -55,11 +60,18 @@ public class Main {
     public static TitleScreen titleScreen;
     public static Level1 level1;
     public static Level2 level2;
+    public static Level3 level3;
+    public static FinishScreen finishScreen;
 
     public static Sprite nextLevel, prevLevel;
     public static RECT nextLevelRect, prevLevelRect;
 
     public static Inventory inventory;
+
+    public static Instant start, stop;
+    public static Duration timeDifference;
+    public static boolean stopTime = false;
+    // TODO: 5/1/2023 add music and sfx for game
 
 
     public static void main(String[] args) {
@@ -74,10 +86,16 @@ public class Main {
         inventory = new Inventory(ctrl);
 
         titleScreen = new TitleScreen(ctrl);
-        titleScreen.setLevelActive(true);
+//        titleScreen.setLevelActive(true);
         level1 = new Level1(ctrl, inventory);
         level2 = new Level2(ctrl, inventory);
+        level3 = new Level3(ctrl, inventory);
+        finishScreen = new FinishScreen(ctrl);
+        level1.setLevelActive(true);
 //        level2.setLevelActive(true);
+//        level3.setLevelActive(true);
+//        finishScreen.setLevelActive(true);
+        start = Instant.now();
 
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
@@ -88,9 +106,11 @@ public class Main {
 //        ctrl.hideDefaultCursor();
 
         nextLevel = new Sprite(1700, 800, ctrl.getSpriteFromBackBuffer("nextLevel").getSprite(), "nextLevel");
-        nextLevelRect = new RECT(1700, 800, 1828, 928, "next Level", new Frame(1700, 800, "nextLevelHover"));
+        nextLevelRect = new RECT(1700, 800, 1828, 928, "next Level", "Next Level",
+                new Frame(1700, 800, "nextLevelHover"));
         prevLevel = new Sprite(1700, 928, ctrl.getSpriteFromBackBuffer("prevLevel").getSprite(), "prevLevel");
-        prevLevelRect = new RECT(1700, 928, 1828, 1056, "previous Level", new Frame(1700, 928, "prevLevelHover"));
+        prevLevelRect = new RECT(1700, 928, 1828, 1056, "previous Level", "Previous Level",
+                new Frame(1700, 928, "prevLevelHover"));
 
         // TODO: 4/19/2023 Affine Transform
 //        BufferedImage wheel = ctrl.getSpriteFromBackBuffer("wheel").getSprite();
@@ -135,19 +155,22 @@ public class Main {
         int x = (int) p.getX();
         int y = (int) p.getY();
 
-        if (!titleScreen.isLevelActive() && !level1.isPuzzleActive() && !level2.isPuzzleActive()/*
-        && !level3.isPuzzleActive && !finishScreen.isLevelActive()*/) {
+        if (!titleScreen.isLevelActive() && !level1.isPuzzleActive() && !level2.isPuzzleActive() && !finishScreen.isLevelActive()) {
             inventory.drawInventory();
 
-//            if (!level3.isLevelActive()) {
             ctrl.addSpriteToHudBuffer(nextLevel);
-            if (nextLevelRect.isCollision(x, y))
+            if (nextLevelRect.isCollision(x, y)) {
                 ctrl.addSpriteToHudBuffer(nextLevelRect.getGraphicalHover());
-//        }
+                ctrl.drawHudString(x, (y - 2), nextLevelRect.getHoverLabel(), Color.BLACK);
+                ctrl.drawHudString(x - dropShadow, (y - dropShadow) - 2, nextLevelRect.getHoverLabel(), Color.yellow);
+            }
             if (!level1.isLevelActive()) {
                 ctrl.addSpriteToHudBuffer(prevLevel);
-                if (prevLevelRect.isCollision(x, y))
+                if (prevLevelRect.isCollision(x, y)) {
                     ctrl.addSpriteToHudBuffer(prevLevelRect.getGraphicalHover());
+                    ctrl.drawHudString(x, (y - 2), prevLevelRect.getHoverLabel(), Color.BLACK);
+                    ctrl.drawHudString(x - dropShadow, (y - dropShadow) - 2, prevLevelRect.getHoverLabel(), Color.yellow);
+                }
             }
         }
         if (titleScreen.isLevelActive()) {
@@ -175,14 +198,14 @@ public class Main {
             level2.runLevel();
             if (level2.isNextLevel()) {
                 level2.setLevelActive(false);
-//                level3.setLevelActive(true);
+                level3.setLevelActive(true);
                 level2.setNextLevel(false);
             }
 
             if (Control.getMouseInput() != null) {
                 if (nextLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && level2.isComplete()) {
                     level2.setLevelActive(false);
-//                    level3.setLevelActive(true);
+                    level3.setLevelActive(true);
                     level2.setNextLevel(false);
                 }
                 if (prevLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
@@ -190,34 +213,43 @@ public class Main {
                     level1.setLevelActive(true);
                 }
             }
-        }
-//        else if (level3.isLevelActive()) {
-//            level3.runLevel();
-//            if (level3.isNextLevel()){
-//                level3.setLevelActive(false);
-//                finishScreen.setLevelActive(true);
-//            }
+        } else if (level3.isLevelActive()) {
+            level3.runLevel();
+            if (level3.isNextLevel()) {
+                level3.setLevelActive(false);
+                finishScreen.setLevelActive(true);
+            }
 
-//           if (Control.getMouseInput() != null) {
-//                if (prevLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-//                    level3.setLevelActive(false);
-//                    level2.setLevelActive(true);
-//                }
-//            }
-//        }
-//        else if (finishScreen.isLevelActive()) {
-//            finishScreen.runLevel();
-//            if (finishScreen.restartClicked()){
-//                  finishScreen.setLevelActive(false);
-//                  inventory = new Inventory(ctrl);
-//                  titleScreen = new TitleScreen(ctrl);
-//                  titleScreen.setLevelActive(true);
-//                  level1 = new Level1(ctrl, inventory);
-//                  level2 = new Level2(ctrl, inventory);
-//                  level3 = new Level3(ctrl, inventory);
-//                  finishScreen = new FinishScreen(ctrl);
-//            }
-//        }
+            if (Control.getMouseInput() != null) {
+                if (nextLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && level3.isComplete()) {
+                    level3.setLevelActive(false);
+                    finishScreen.setLevelActive(true);
+                    level3.setNextLevel(false);
+                }
+                if (prevLevelRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+                    level3.setLevelActive(false);
+                    level2.setLevelActive(true);
+                }
+            }
+        } else if (finishScreen.isLevelActive()) {
+            finishScreen.runLevel();
+            if (!stopTime) {
+                stop = Instant.now();
+                timeDifference = Duration.between(start, stop);
+                stopTime = true;
+                finishScreen.setCompleteTime(timeDifference);
+            }
+            if (finishScreen.isRestartClicked()) {
+                finishScreen.setLevelActive(false);
+                inventory = new Inventory(ctrl);
+                titleScreen = new TitleScreen(ctrl);
+                titleScreen.setLevelActive(true);
+                level1 = new Level1(ctrl, inventory);
+                level2 = new Level2(ctrl, inventory);
+                level3 = new Level3(ctrl, inventory);
+                finishScreen = new FinishScreen(ctrl);
+            }
+        }
 
 
 //        for (int i = 0; i < 5; i++) {

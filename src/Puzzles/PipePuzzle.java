@@ -128,7 +128,9 @@ public class PipePuzzle {
             }
     }
 
-    public void drawPuzzle() {
+    public void drawPuzzle(Sprite sprite) {
+        ctrl.addSpriteToFrontBuffer(sprite);
+
         Point p = Mouse.getMouseCoords();
 
         mouseCursor.moveXAbsolute(p.x - 16);

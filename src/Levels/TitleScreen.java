@@ -48,8 +48,6 @@ public class TitleScreen {
     }
 
     public void runLevel() {
-        // TODO: 4/24/2023 if startRect is clicked, set startClicked to true and in Main Update set Level1 levelActive
-        //  to true if startClicked is true.  Then set levelActive for TitleScreen to false
         Point p = Mouse.getMouseCoords();
 
         ctrl.addSpriteToFrontBuffer(0, 0, "titleScreen");
@@ -83,5 +81,6 @@ public class TitleScreen {
 
     private void displayLeaderboard() {
         // TODO: 4/25/2023 display the leaderboard (get the top ten times from a file called leaderboard.txt)
+        // TODO: 5/1/2023 read times from a file if there are times inside the file (current line != null)
     }
 }
