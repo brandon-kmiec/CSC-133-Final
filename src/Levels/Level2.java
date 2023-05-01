@@ -6,6 +6,7 @@ import Graphics.Graphic;
 import Input.Mouse;
 import Inventory.Inventory;
 import Puzzles.SimonSays;
+import Sound.Sound;
 import logic.Control;
 
 import java.awt.*;
@@ -39,6 +40,7 @@ public class Level2 {
     private boolean changeMouse;
     private boolean puzzleActive;
     private boolean complete;
+    private boolean musicPlaying;
     private final SimonSays simonSays;
     private final AText aText;
     private final ArrayList<AText> aTextList;
@@ -59,6 +61,7 @@ public class Level2 {
         changeMouse = false;
         puzzleActive = false;
         complete = false;
+        musicPlaying = false;
 
         aText = new AText("", 20);
         aTextList = new ArrayList<>();
@@ -157,6 +160,12 @@ public class Level2 {
         ctrl.addSpriteToFrontBuffer(backgroundSprite);
 
         if (startAnim) {
+            if (!musicPlaying) {
+                musicPlaying = true;
+                Sound sound = new Sound("puzzleComplete");
+                sound.resetWAV();
+                sound.playWAV();
+            }
             doorAnimation();
             complete = true;
         } else

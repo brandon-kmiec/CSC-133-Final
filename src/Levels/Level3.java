@@ -5,6 +5,7 @@ import Data.Frame;
 import Graphics.Graphic;
 import Input.Mouse;
 import Inventory.Inventory;
+import Sound.Sound;
 import logic.Control;
 
 import java.awt.*;
@@ -63,11 +64,11 @@ public class Level3 {
         textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
                 "textBox");
 
-        stickFigure = new Sprite(670, 700, ctrl.getSpriteFromBackBuffer("f0").getSprite(),
+        stickFigure = new Sprite(670, 700, ctrl.getSpriteFromBackBuffer("stickFigure").getSprite(),
                 "Stick Figure");
         stickFigureRect = new RECT(stickFigure.getX(), stickFigure.getY(), stickFigure.getX() + 128,
                 stickFigure.getY() + 128, "stickFigure", "Stick Figure",
-                new Frame(stickFigure.getX(), stickFigure.getY(), "f1"));
+                new Frame(stickFigure.getX(), stickFigure.getY(), "stickFigure"));
 
         itemSprite = new Sprite(1500, 750, ctrl.getSpriteFromBackBuffer("cheeseBurger").getSprite(), "cheeseBurger");
         itemRect = new RECT(-50, -50, -50, -50, "cheeseBurger", "Cheese Burger");
@@ -204,7 +205,7 @@ public class Level3 {
         if (Control.getMouseInput() != null) {
             if (nextLevelDoor.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
                 if (!fedBurger) {
-                    doorDialog = "This is not your boat. Try asking the stick figure.";
+                    doorDialog = "This is not your boat. Try talking to the stick figure.";
                     aTextList.clear();
                     wrap = aText.wrapText(doorDialog, 183);
                 } else {
@@ -228,6 +229,10 @@ public class Level3 {
                     holdingItem = false;
                     fedBurger = true;
                     complete = true;
+
+                    Sound sound = new Sound("puzzleComplete");
+                    sound.resetWAV();
+                    sound.playWAV();
                 } else {
                     puzzleDialog = "Thank you for the food!  You are free to use the boat.";
                     aTextList.clear();

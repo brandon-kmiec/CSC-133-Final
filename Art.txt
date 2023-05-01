@@ -75,6 +75,7 @@ Art/Snow2.png*Snow2
 Art/Snow3.png*Snow3
 Art/Snow4.png*Snow4
 Art/Snow5.png*Snow5
+Art/stickFigure.png*stickFigure
 Art/textBox.png*textBox
 Art/titleScreen.png*titleScreen
 Art/tree.png*tree

@@ -86,12 +86,11 @@ public class Main {
         inventory = new Inventory(ctrl);
 
         titleScreen = new TitleScreen(ctrl);
-//        titleScreen.setLevelActive(true);
+        titleScreen.setLevelActive(true);
         level1 = new Level1(ctrl, inventory);
         level2 = new Level2(ctrl, inventory);
         level3 = new Level3(ctrl, inventory);
         finishScreen = new FinishScreen(ctrl);
-        level1.setLevelActive(true);
 //        level2.setLevelActive(true);
 //        level3.setLevelActive(true);
 //        finishScreen.setLevelActive(true);
@@ -154,6 +153,8 @@ public class Main {
         Point p = Mouse.getMouseCoords();
         int x = (int) p.getX();
         int y = (int) p.getY();
+
+        drawQuit(ctrl, p);
 
         if (!titleScreen.isLevelActive() && !level1.isPuzzleActive() && !level2.isPuzzleActive() && !finishScreen.isLevelActive()) {
             inventory.drawInventory();
@@ -399,5 +400,41 @@ public class Main {
             int val = Integer.parseInt(value);
             buffer[i] = val;
         }
+    }
+
+    public static void drawQuit(Control ctrl, Point p) {
+        BufferedImage bufferedImage = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bufferedImage.getGraphics();
+        Font font = new Font(ctrl.getFont().getFontName(), ctrl.getFont().getStyle(), 100);
+        g.setFont(font);
+        Color c = new Color(76, 44, 182);
+        g.setColor(c);
+        RECT quitRect;
+        if (titleScreen.isLevelActive() || finishScreen.isLevelActive()) {
+            g.setColor(c);
+            quitRect = new RECT(867, 958, 977, 1015, "quit");
+            g.fillRect(quitRect.getX1(), quitRect.getY1(), 110, 57);
+            g.setColor(Color.BLACK);
+            g.drawString("Quit", gameString.getCenteredXPosition(g, font, "Quit", 0, 1850, 1), 1000);
+        } else {
+            g.setColor(c);
+            quitRect = new RECT(200, 57, 304, 115, "quit");
+            g.fillRect(quitRect.getX1(), quitRect.getY1(), 110, 57);
+            g.setColor(Color.BLACK);
+            g.drawString("Quit", 200, 100);
+        }
+
+        if (quitRect.isCollision(p.x, p.y)) {
+            g.setColor(new Color(0, 0, 0, 80));
+            g.fillRect(quitRect.getX1(), quitRect.getY1(), 110, 57);
+        }
+        if (Control.getMouseInput() != null)
+            if (quitRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON))
+                System.exit(0);
+
+        g.dispose();
+        Sprite sprite = new Sprite(0, 0, bufferedImage, "exitButton");
+        ctrl.addSpriteToHudBuffer(sprite);
+
     }
 }

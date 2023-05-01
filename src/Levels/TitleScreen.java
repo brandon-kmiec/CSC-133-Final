@@ -3,11 +3,14 @@ package Levels;
 import Data.Click;
 import Data.RECT;
 import Data.Sprite;
+import Data.gameString;
+import FileIO.EZFileRead;
 import Input.Mouse;
 import logic.Control;
 import Graphics.Graphic;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class TitleScreen {
     // Fields
@@ -50,37 +53,92 @@ public class TitleScreen {
     public void runLevel() {
         Point p = Mouse.getMouseCoords();
 
+
         ctrl.addSpriteToFrontBuffer(0, 0, "titleScreen");
 
         mouseCursor.moveXAbsolute(p.x - 16);
         mouseCursor.moveYAbsolute(p.y - 18);
         ctrl.addSpriteToOverlayBuffer(mouseCursor);
 
-        if (startRect.isCollision(p.x, p.y))
-            hoverText = "Click to Start";
-        else if (leaderboardRect.isCollision(p.x, p.y))
-            hoverText = "Click to view Leaderboard";
-        else
-            hoverText = "";
+        if (!leaderboardClicked) {
+            if (startRect.isCollision(p.x, p.y))
+                hoverText = "Click to Start";
+            else if (leaderboardRect.isCollision(p.x, p.y))
+                hoverText = "Click to view Leaderboard";
+            else
+                hoverText = "";
 
-        ctrl.drawString(p.x, (p.y - 2), hoverText, Color.BLACK);
-        ctrl.drawString((p.x - 2), (p.y - 2) - 2, hoverText, Color.YELLOW);
+            ctrl.drawString(p.x, (p.y - 2), hoverText, Color.BLACK);
+            ctrl.drawString((p.x - 2), (p.y - 2) - 2, hoverText, Color.YELLOW);
 
-        if (Control.getMouseInput() != null) {
-            if (startRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-                startClicked = true;
+            if (Control.getMouseInput() != null) {
+                if (startRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+                    startClicked = true;
+                }
+                if (leaderboardRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+                    leaderboardClicked = true;
+                }
             }
-            if (leaderboardRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-                leaderboardClicked = true;
-            }
-        }
-
-        if (leaderboardClicked)
+        } else
             displayLeaderboard();
     }
 
     private void displayLeaderboard() {
-        // TODO: 4/25/2023 display the leaderboard (get the top ten times from a file called leaderboard.txt)
-        // TODO: 5/1/2023 read times from a file if there are times inside the file (current line != null)
+        Point p = Mouse.getMouseCoords();
+
+        BufferedImage leaderboard = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = leaderboard.getGraphics();
+        Font font = new Font(ctrl.getFont().getFontName(), ctrl.getFont().getStyle(), 200);
+        g.setFont(font);
+
+        g.setColor(new Color(0, 0, 0, 100));
+        g.fillRect(0, 0, 1920, 1080);
+
+        g.setColor(Color.WHITE);
+
+        g.drawString("Leaderboard", gameString.getCenteredXPosition(g, font, "Leaderboard", 0, 1919, 1), 100);
+
+        font = new Font(ctrl.getFont().getFontName(), ctrl.getFont().getStyle(), 100);
+        g.setFont(font);
+
+        // TODO: 5/1/2023 implement ability to read and store three letter player name with completed time
+        EZFileRead ezr = new EZFileRead("leaderboard.txt");
+        int size = ezr.getNumLines();
+        if (size > 10)
+            size = 10;
+
+        for (int i = 0; i < size; i++) {
+            int y = (i << 6) + 200;
+
+            int time = Integer.parseInt(ezr.getLine(i));
+            long milliseconds = time % 1000;
+            long seconds = time / 1000 % 60;
+            long minutes = time / (60 * 1000) % 60;
+            long hours = time / (60 * 60 * 1000) % 24;
+
+            String temp = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+
+            g.drawString(temp, gameString.getCenteredXPosition(g, font, temp, 0, 1919, 1), y);
+            ezr.getNextLine();
+        }
+
+        font = new Font(ctrl.getFont().getFontName(), ctrl.getFont().getStyle(), 50);
+        g.setFont(font);
+        g.drawString("Exit Leaderboard", 1600, 50);
+
+        RECT exitRect = new RECT(1600, 26, 1814, 50, "exitRect");
+        g.setColor(new Color(0, 0, 0, 200));
+
+        if (exitRect.isCollision(p.x, p.y))
+            g.fillRect(1600, 26, 214, 25);
+
+        if (Control.getMouseInput() != null)
+            if (exitRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON))
+                leaderboardClicked = false;
+
+        g.dispose();
+
+        Sprite sprite = new Sprite(0, 0, leaderboard, "leaderboard");
+        ctrl.addSpriteToFrontBuffer(sprite);
     }
 }

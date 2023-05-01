@@ -5,6 +5,7 @@ import Data.Frame;
 import Input.Mouse;
 import Inventory.Inventory;
 import Puzzles.PipePuzzle;
+import Sound.Sound;
 import logic.Control;
 import Graphics.Graphic;
 
@@ -39,6 +40,7 @@ public class Level1 {
     private boolean changeMouse;
     private boolean puzzleActive;
     private boolean complete;
+    private boolean musicPlaying;
     private final PipePuzzle pipePuzzle;
     private final AText aText;
     private final ArrayList<AText> aTextList;
@@ -59,6 +61,7 @@ public class Level1 {
         changeMouse = false;
         puzzleActive = false;
         complete = false;
+        musicPlaying = false;
 
         aText = new AText("", 20);
         aTextList = new ArrayList<>();
@@ -106,6 +109,7 @@ public class Level1 {
         if (pipePuzzle.isPuzzleSolved() && pipePuzzle.isExitPuzzle()) {
             pipePuzzle.setPuzzleActive(false);
             puzzleActive = false;
+
         }
         if (PipePuzzle.isPuzzleActive()) {
             puzzleActive = true;
@@ -157,10 +161,16 @@ public class Level1 {
         Point p = Mouse.getMouseCoords();
 
         if (startAnim) {
+            if (!musicPlaying) {
+                musicPlaying = true;
+                Sound sound = new Sound("puzzleComplete");
+                sound.resetWAV();
+                sound.playWAV();
+            }
+
             doorAnimation();
             complete = true;
-        }
-        else
+        } else
             ctrl.addSpriteToFrontBuffer(closedDoor);
 
         ctrl.addSpriteToFrontBuffer(backgroundSprite);
