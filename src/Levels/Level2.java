@@ -46,6 +46,7 @@ public class Level2 {
     private final ArrayList<AText> aTextList;
     private ArrayList<String> wrap;
     private final RECT[] inventorySlots;
+    private final Sound explosion;
 
     // Constructor
     public Level2(Control ctrl, Inventory inventory) {
@@ -100,6 +101,8 @@ public class Level2 {
         inventoryHoverLabel = "";
 
         nextLevelDoor = new RECT(780, 527, 908, 628, "boulder", doorHoverLabel);
+
+        explosion = new Sound("fireworkExplosion");
     }
 
     // Methods
@@ -165,6 +168,8 @@ public class Level2 {
                 Sound sound = new Sound("puzzleComplete");
                 sound.resetWAV();
                 sound.playWAV();
+
+                explosion.restartWAV();
             }
             doorAnimation();
             complete = true;

@@ -75,7 +75,6 @@ public class FinishScreen {
             long seconds = completeTime.toMillis() / 1000 % 60;
             long minutes = completeTime.toMillis() / (60 * 1000) % 60;
             long hours = completeTime.toMillis() / (60 * 60 * 1000) % 24;
-            long days = completeTime.toMillis() / (24 * 60 * 60 * 1000);
 
             temp = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
 
@@ -114,13 +113,10 @@ public class FinishScreen {
             ctrl.addSpriteToFrontBuffer(sprite);
         }
 
-
-        // TODO: 5/1/2023 find a way to run a limited num of times (if counter < some number where counter++ is at the end of the if statement body)
         UpdateParticles fireworkParticles = new UpdateParticles(ctrl, true, firework.getParticleSystem());
         for (int i = 0; i < firework.explosions.length; i++)
             if (firework.explosions[i] != null)
                 new UpdateParticles(ctrl, false, firework.explosions[i].getParticleSystem());
-
 
         mouseCursor.moveXAbsolute(p.x - 16);
         mouseCursor.moveYAbsolute(p.y - 18);

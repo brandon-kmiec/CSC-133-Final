@@ -1,12 +1,13 @@
 package Particles;
 
-import logic.Control;
+import Sound.Sound;
 
 public class Firework {
     // Fields
     private final ParticleSystem parts;
-    private final String[] spriteTags;
-    private int xPos, xRange;
+    private final int xPos;
+    private final int xRange;
+    private final Sound explosion;
     public FireworkExplosion[] explosions;
 
     // Constructor
@@ -14,7 +15,7 @@ public class Firework {
         this.xPos = xPos;
         this.xRange = xRange;
 
-        spriteTags = new String[1];
+        String[] spriteTags = new String[1];
         spriteTags[0] = "fireworkRocket";
 
         int xSpeed = 0;
@@ -22,6 +23,8 @@ public class Firework {
 
         parts = new ParticleSystem(numParticles, xPos, yPos, xRange, yRange, minLife, maxLife, xSpeed, ySpeed,
                 32, 80, spriteTags);
+
+        explosion = new Sound("fireworkExplosion");
 
         explosions = new FireworkExplosion[parts.getParticleArray().length];
     }
@@ -32,32 +35,15 @@ public class Firework {
 
         for (int i = 0; i < pa.length; i++) {
             Particle particle = pa[i];
-            int stages = spriteTags.length;
             int life = particle.getLifeCycle();
-            int range = life / stages;
             int age = particle.getAge();
 
             if (age + 1 >= life) {
+                explosion.restartWAV();
                 explosions[i] = new FireworkExplosion(particle.getX(), particle.getY(), 16, 48, 150);
                 particle.changeRootX(Particle.getRandomInt(xPos, xRange));
-
-//                fireworkExplosion = new FireworkExplosion(particle.getX(), particle.getY(), 16, 32, 150);
             }
 
-            if (age >= life)
-
-
-            for (int j = 0; j < stages; j++) {
-                if (age >= (range * j) && age < (range * (j + 1))) {
-                    particle.changeSprite(spriteTags[j]);
-                    break;
-                }
-            }
-
-//            if (particle.isParticleDead()){
-//            if (fireworkExplosion != null) {
-//                fireworkExplosion.getParticleSystem();
-//            }
         }
     }
 

@@ -12,10 +12,10 @@ import java.util.ArrayList;
 public class Interpreter {
     // Fields
     private static final int dropShadow = 2;
-    private Control ctrl;
+    private final Control ctrl;
     private static String hoverLabelStr;
     private static String tagStr;
-    private ArrayList<Command> commands;
+    private final ArrayList<Command> commands;
     private static ArrayList<Command> rectCommands;
     private static boolean musicPlaying;
     private boolean animationPlaying;
