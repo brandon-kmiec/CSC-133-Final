@@ -71,8 +71,8 @@ public class Main {
     public static Instant start, stop;
     public static Duration timeDifference;
     public static boolean stopTime = false;
-    // TODO: 5/1/2023 add music and sfx for game
 
+    public static Sound backgroundMusic;
 
     public static void main(String[] args) {
         updateArtScript();
@@ -96,13 +96,15 @@ public class Main {
 //        finishScreen.setLevelActive(true);
         start = Instant.now();
 
+        backgroundMusic = new Sound("backgroundMusic");
+        backgroundMusic.setLoop();
 
         rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
         smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
         snow = new Snow(-50, 0, 1350, 90, 50, 250, 150);
         firework = new Firework(200, 1000, 1720, 100, 25, 75, 5);
 
-//        ctrl.hideDefaultCursor();
+        ctrl.hideDefaultCursor();
 
         nextLevel = new Sprite(1700, 800, ctrl.getSpriteFromBackBuffer("nextLevel").getSprite(), "nextLevel");
         nextLevelRect = new RECT(1700, 800, 1828, 928, "next Level", "Next Level",
@@ -133,7 +135,7 @@ public class Main {
 //                    commands.add(new Command(raw));
 //            }
 //        }
-//
+
         disk = new RECT(50, 50, 114, 114, "savetag", "Save Game",
                 new Frame(100, 50, "saveIcon2Hover"));
         load = new RECT(200, 50, 264, 114, "loadtag", "Load Game",
@@ -234,6 +236,7 @@ public class Main {
             }
         } else if (finishScreen.isLevelActive()) {
             finishScreen.runLevel();
+            backgroundMusic.pauseWAV();
             if (!stopTime) {
                 stop = Instant.now();
                 timeDifference = Duration.between(start, stop);
@@ -249,16 +252,10 @@ public class Main {
                 level2 = new Level2(ctrl, inventory);
                 level3 = new Level3(ctrl, inventory);
                 finishScreen = new FinishScreen(ctrl);
+                backgroundMusic.restartWAV();
             }
         }
 
-
-//        for (int i = 0; i < 5; i++) {
-//            int x1 = (i << 7) + 800;
-//            ctrl.addSpriteToHudBuffer(new Sprite(x1, 900, ctrl.getSpriteFromBackBuffer("inventorySlot").getSprite(), "test"));
-//        }
-
-//        ctrl.addSpriteToFrontBuffer(0, 0, "forest");
 
         // TODO: 4/19/2023 Affine Transform
 //        if (timer1.isTimeUp()) {
@@ -435,6 +432,5 @@ public class Main {
         g.dispose();
         Sprite sprite = new Sprite(0, 0, bufferedImage, "exitButton");
         ctrl.addSpriteToHudBuffer(sprite);
-
     }
 }
