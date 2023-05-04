@@ -145,7 +145,7 @@ public class Main {
             int value = (int) (Math.random() * 100);
             buffer[i] = value;
         }
-//
+
 //        interpreter = new Interpreter(ctrl, commands);
     }
 

@@ -52,6 +52,7 @@ public class Control {
         hudText = new ArrayList<>();            // This is for HUD-level text (sits above HUD images)
         setupFont();                            // Set up our program to use a font custom (stored in "Font" subfolder)
         loadArtIntoBackBuffer();                // Loads the art referenced in "Art.txt" into the backbuffer of sprites
+        loadSpriteSheetArtIntoBackBuffer();
         kb = new Keyb();                        // Initialize the keyboard handler
         mouse = new Mouse();                    // Set up new mouse handler
         gl = new gameLoop(graphic, gs, frontbuffer, hudText, hudBuffer, overlaybuffer);        // Sets up our render loop
@@ -151,12 +152,26 @@ public class Control {
     }
 
     // load art into backbuffer from sprite sheet
-//    private void loadArtIntoBackBuffer() {
-//        backbuffer.addSprite(new Sprite(0,0, "Art/spriteSheet.png", "spriteSheet"));
-//
-//        // backbuffer.addSprite(spriteSheet subimage at x, y coords with subimage width, height)
-//        // get largest images first, then move down a size ... (512x512, 256x256, 128x128, 64x64, ...)
-//    }
+    private void loadSpriteSheetArtIntoBackBuffer() {
+        // spriteSheet and sprites.txt generated from https://www.leshylabs.com/apps/sstool/
+        // This website took image files as an input and compiled them into a sprite sheet with a sprite map file that
+        // was already set up for use with a string tokenizer
+
+        BufferedImage pImage = getSpriteFromBackBuffer("spriteSheet").getSprite();
+        EZFileRead ezr = new EZFileRead("sprites.txt");
+        for (int i = 0; i < ezr.getNumLines(); i++) {
+            String raw = ezr.getLine(i);
+            StringTokenizer st = new StringTokenizer(raw, ",");
+
+            String tag = st.nextToken();
+            int x = Integer.parseInt(st.nextToken());
+            int y = Integer.parseInt(st.nextToken());
+            int w = Integer.parseInt(st.nextToken());
+            int h = Integer.parseInt(st.nextToken());
+
+            backbuffer.addSprite(new Sprite(0, 0, pImage.getSubimage(x, y, w, h), tag));
+        }
+    }
 
     // WARNING! DO NOT MODIFY THE CODE HERE! THIS IS HERE TO GET THE GAME LIBRARY TO WORK!
     private void setupFont() {
