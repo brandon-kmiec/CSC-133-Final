@@ -15,7 +15,7 @@ public class Interpreter {
     private final Control ctrl;
     private static String hoverLabelStr;
     private static String tagStr;
-    private final ArrayList<Command> commands;
+    private ArrayList<Command> commands = new ArrayList<>();
     private static ArrayList<Command> rectCommands;
     private static boolean musicPlaying;
     private boolean animationPlaying;
@@ -68,6 +68,46 @@ public class Interpreter {
                 startAnimation(c);
             }
         }
+
+        if (!rectCommands.isEmpty())
+            clickableRect(rectCommands);
+    }
+
+    public void checkCommand(Command c) {
+//        for (Command c : commands) {
+        if (c.isCommand("show_sprite") && c.getNumParams() == 3)
+            showSprite(c);
+        else if (c.isCommand("text") && c.getNumParams() == 1)
+            showText(c);
+        else if (c.isCommand("text") && c.getNumParams() == 3)
+            showTextAtCoords(c);
+        else if (c.isCommand("text_hover_rect") && c.getNumParams() == 6)
+            rectCommands.add(c);
+        else if (c.isCommand("load_bg") && c.getNumParams() == 1)
+            loadBackground(c);
+        else if (c.isCommand("display_overlay_item") && c.getNumParams() == 3)
+            displayItem(c);
+        else if (c.isCommand("play_music") && c.getNumParams() == 1)
+            playMusic(c);
+        else if (c.isCommand("play_music_loop") && c.getNumParams() == 1)
+            playMusicLoop(c);
+        else if (c.isCommand("start_animation") && c.getNumParams() >= 6) {
+            int delay = Integer.parseInt(c.getParamByIndex(0));
+            boolean isLooping = Boolean.parseBoolean(c.getParamByIndex(1));
+            int x = Integer.parseInt(c.getParamByIndex(2));
+            int y = Integer.parseInt(c.getParamByIndex(3));
+
+            if (!animationPlaying) {
+                animation = new Animation(delay, isLooping);
+
+                for (int i = 4; i < c.getNumParams(); i++)
+                    animation.addFrame(new Frame(x, y, c.getParamByIndex(i)));
+
+                animationPlaying = true;
+            }
+            startAnimation(c);
+        }
+//        }
 
         if (!rectCommands.isEmpty())
             clickableRect(rectCommands);
@@ -138,6 +178,7 @@ public class Interpreter {
     private void playMusic(Command c) {
         Sound music = new Sound(c.getParamByIndex(0));
         if (!musicPlaying) {
+            music.resetWAV();
             music.playWAV();
             musicPlaying = true;
         }

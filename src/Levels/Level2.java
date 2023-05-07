@@ -2,10 +2,12 @@ package Levels;
 
 import Data.*;
 import Data.Frame;
+import FileIO.EZFileRead;
 import Graphics.Graphic;
 import Input.Mouse;
 import Inventory.Inventory;
 import Puzzles.SimonSays;
+import ScriptingEngine.Interpreter;
 import Sound.Sound;
 import logic.Control;
 
@@ -20,8 +22,8 @@ public class Level2 {
     private final RECT puzzle;
     private RECT itemRect;
     private final Sprite puzzleSprite;
-    private final Sprite textBox;
-    private final Sprite backgroundSprite;
+//    private final Sprite textBox;
+//    private final Sprite backgroundSprite;
     private final Sprite itemSprite;
     private final Sprite mouseCursor;
     private String doorHoverLabel;
@@ -47,6 +49,8 @@ public class Level2 {
     private ArrayList<String> wrap;
     private final RECT[] inventorySlots;
     private final Sound explosion;
+    private final ArrayList<Command> commands;
+    private final Interpreter interpreter;
 
     // Constructor
     public Level2(Control ctrl, Inventory inventory) {
@@ -64,14 +68,14 @@ public class Level2 {
         complete = false;
         musicPlaying = false;
 
-        aText = new AText("", 20);
+        aText = new AText("", 20, ctrl);
         aTextList = new ArrayList<>();
         wrap = new ArrayList<>();
 
-        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level2Background").getSprite(),
-                "background");
-        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
-                "textBox");
+//        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level2Background").getSprite(),
+//                "background");
+//        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
+//                "textBox");
 
         puzzleSprite = new Sprite(320, 560, ctrl.getSpriteFromBackBuffer("simonSaysPuzzle").getSprite(),
                 "puzzle");
@@ -103,6 +107,10 @@ public class Level2 {
         nextLevelDoor = new RECT(780, 527, 908, 628, "boulder", doorHoverLabel);
 
         explosion = new Sound("fireworkExplosion");
+
+        commands = new ArrayList<>();
+        interpreter = new Interpreter(ctrl, commands);
+        readCommands();
     }
 
     // Methods
@@ -160,9 +168,11 @@ public class Level2 {
     private void drawSprites() {
         Point p = Mouse.getMouseCoords();
 
-        ctrl.addSpriteToFrontBuffer(backgroundSprite);
+//        ctrl.addSpriteToFrontBuffer(backgroundSprite);
+        interpreter.checkCommand(commands.get(0));
 
         if (startAnim) {
+            doorAnimation();
             if (!musicPlaying) {
                 musicPlaying = true;
                 Sound sound = new Sound("puzzleComplete");
@@ -171,17 +181,19 @@ public class Level2 {
 
                 explosion.restartWAV();
             }
-            doorAnimation();
             complete = true;
         } else
             ctrl.addSpriteToFrontBuffer(closedDoor);
 
-        ctrl.addSpriteToFrontBuffer(textBox);
+//        ctrl.addSpriteToFrontBuffer(textBox);
+        interpreter.checkCommand(commands.get(2));
 
         ctrl.addSpriteToFrontBuffer(puzzleSprite);
 
         if (simonSays.isPuzzleSolved() && !holdingItem && !startAnim && !inInventory) {
-            ctrl.addSpriteToFrontBuffer(itemSprite);
+//            ctrl.addSpriteToFrontBuffer(itemSprite);
+            interpreter.checkCommand(commands.get(1));
+
             itemRect = new RECT(1712, itemSprite.getY(), 1751, itemSprite.getY() + 128, itemRect.getTag(),
                     itemRect.getHoverLabel());
         } else if (simonSays.isPuzzleSolved() && inInventory)
@@ -203,7 +215,7 @@ public class Level2 {
 
     private void drawAnimatedText() {
         for (int i = 0; i < wrap.size(); i++) {
-            aTextList.add(new AText(wrap.get(i), 20));
+            aTextList.add(new AText(wrap.get(i), 20, ctrl));
             String test = aTextList.get(i).getCurrentStr();
             ctrl.drawString(70, 790 + (i * 20), test, Color.black);
         }
@@ -260,20 +272,20 @@ public class Level2 {
                 if (!simonSays.isPuzzleSolved()) {
                     doorDialog = "The puzzle has not yet been solved. Try solving the puzzle to open the path.";
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 183);
+                    wrap = aText.wrapText(doorDialog);
                 } else if (simonSays.isPuzzleSolved() && !holdingItem && !startAnim) {
                     doorDialog = "An item is needed to open the path. Look around for something that looks " +
                             "like dynamite.";
 
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 150);
+                    wrap = aText.wrapText(doorDialog);
                 } else if (simonSays.isPuzzleSolved() && holdingItem) {
                     startAnim = true;
 
                     doorDialog = "";
 
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 200);
+                    wrap = aText.wrapText(doorDialog);
                     holdingItem = false;
                 } else if (simonSays.isPuzzleSolved() && startAnim)
                     nextLevel = true;
@@ -285,7 +297,7 @@ public class Level2 {
                     puzzleDialog = "The puzzle has already been solved. Find an item to open the path.";
 
                     aTextList.clear();
-                    wrap = aText.wrapText(puzzleDialog, 200);
+                    wrap = aText.wrapText(puzzleDialog);
                 }
             }
             if (itemRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && !holdingItem) {
@@ -314,5 +326,18 @@ public class Level2 {
         Frame curFrame = doorOpen.getCurrentFrame();
         if (curFrame != null)
             ctrl.addSpriteToFrontBuffer(curFrame);
+    }
+
+    private void readCommands() {
+        EZFileRead ezr = new EZFileRead("level2Script.txt");
+        for (int i = 0; i < ezr.getNumLines(); i++) {
+            String raw = ezr.getLine(i);
+            raw = raw.trim();
+            if (!raw.equals("")) {
+                boolean b = raw.charAt(0) == '#';
+                if (!b)
+                    commands.add(new Command(raw));
+            }
+        }
     }
 }

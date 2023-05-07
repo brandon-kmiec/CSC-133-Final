@@ -1,8 +1,12 @@
 package Data;
 
+import logic.Control;
 import timer.stopWatchX;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -13,10 +17,12 @@ public class AText {
     private stopWatchX timer;   // This controls the speed of the text
     private boolean isFinished; // Flag for when animation is over
     private int cursor;         // Track the index into the srcStr
+    private Control ctrl;
 
     // Constructor
-    public AText(String srcStr, int delay) {
+    public AText(String srcStr, int delay, Control ctrl) {
         this.srcStr = srcStr;
+        this.ctrl = ctrl;
         timer = new stopWatchX(delay);
         destStr = "";
         isFinished = false;
@@ -52,27 +58,31 @@ public class AText {
         this.srcStr = newStr;
     }
 
-    public ArrayList<String> wrapText(String raw, int n) {
+    public ArrayList<String> wrapText(String raw) {
+//        String[] words = raw.split(" ");
+//        ArrayList<String> lines = new ArrayList<>();
+//        int count = 0;
+//        String current = "";
+//        Queue<String > q = new LinkedList<>();
+//        for (String word : words)
+//            q.add(word);
+//
+//        while (q.peek() != null) {
+//            if (q.peek().length() + count < n){
+//                current += q.poll() + " ";
+//                count += current.length();
+//            } else {
+//                lines.add(current);
+//                current = "";
+//                count = 0;
+//            }
+//        }
+//        lines.add(current);
+        Graphics g = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB).getGraphics();
+        Font font = ctrl.getFont();
         String[] words = raw.split(" ");
-        ArrayList<String> lines = new ArrayList<>();
-        int count = 0;
-        String current = "";
-        Queue<String > q = new LinkedList<>();
-        for (String word : words)
-            q.add(word);
+        String[] ret = gameString.wordWrapX(words, 500, g, font);
 
-        while (q.peek() != null) {
-            if (q.peek().length() + count < n){
-                current += q.poll() + " ";
-                count += current.length();
-            } else {
-                lines.add(current);
-                current = "";
-                count = 0;
-            }
-        }
-        lines.add(current);
-
-        return lines;
+        return new ArrayList<>(Arrays.asList(ret));
     }
 }

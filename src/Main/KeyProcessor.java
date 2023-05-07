@@ -8,14 +8,14 @@ import timer.stopWatchX;
 public class KeyProcessor {
     // Static Fields
     private static char last = ' ';            // For debouncing purposes
-    private static stopWatchX sw = new stopWatchX(250);
+    private static final stopWatchX sw = new stopWatchX(250);
 
     // Static Method(s)
     public static void processKey(char key) {
         if (key == ' ') return;
         // Debounce routine below...
         if (key == last)
-            if (sw.isTimeUp() == false) return;
+            if (!sw.isTimeUp()) return;
         last = key;
         sw.resetWatch();
 
@@ -30,21 +30,21 @@ public class KeyProcessor {
                 Control.isMouseCoordsDisplayed = !Control.isMouseCoordsDisplayed;
                 break;
 
-            case 't':
-                // For resetting the text animation
-                Main.aText.resetAnimation();
-                break;
+//            case 't':
+//                // For resetting the text animation
+//                Main.aText.resetAnimation();
+//                break;
 
-            case 'f':
-                Main.sfx.playWAV();
-                break;
+//            case 'f':
+//                Main.sfx.playWAV();
+//                break;
 
-            case 'p':
-                if (Main.song.isPlaying())
-                    Main.song.pauseWAV();
-                else
-                    Main.song.setLoop();
-                break;
+//            case 'p':
+//                if (Main.song.isPlaying())
+//                    Main.song.pauseWAV();
+//                else
+//                    Main.song.setLoop();
+//                break;
         }
     }
 }

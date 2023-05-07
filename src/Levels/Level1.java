@@ -2,10 +2,12 @@ package Levels;
 
 import Data.*;
 import Data.Frame;
+import FileIO.EZFileRead;
 import Input.Mouse;
 import Inventory.Inventory;
 import Puzzles.PipePuzzle;
-import Sound.Sound;
+import ScriptingEngine.Interpreter;
+//import Sound.Sound;
 import logic.Control;
 import Graphics.Graphic;
 
@@ -21,7 +23,7 @@ public class Level1 {
     private RECT itemRect;
     private final Sprite puzzleSprite;
     private final Sprite textBox;
-    private final Sprite backgroundSprite;
+//    private final Sprite backgroundSprite;
     private final Sprite itemSprite;
     private final Sprite mouseCursor;
     private String doorHoverLabel;
@@ -31,7 +33,7 @@ public class Level1 {
     private String itemHoverLabel;
     private String inventoryHoverLabel;
     private final Frame closedDoor;
-    private final Animation doorOpen;
+//    private final Animation doorOpen;
     private boolean levelActive;
     private boolean startAnim;
     private boolean holdingItem;
@@ -46,6 +48,8 @@ public class Level1 {
     private final ArrayList<AText> aTextList;
     private ArrayList<String> wrap;
     private final RECT[] inventorySlots;
+    private final ArrayList<Command> commands;
+    private final Interpreter interpreter;
 
     // Constructor
     public Level1(Control ctrl, Inventory inventory) {
@@ -63,12 +67,12 @@ public class Level1 {
         complete = false;
         musicPlaying = false;
 
-        aText = new AText("", 20);
+        aText = new AText("", 20, ctrl);
         aTextList = new ArrayList<>();
         wrap = new ArrayList<>();
 
-        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level1Background").getSprite(),
-                "background");
+//        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level1Background").getSprite(),
+//                "background");
         textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
                 "textBox");
 
@@ -85,12 +89,12 @@ public class Level1 {
 
         closedDoor = new Frame(830, 0, "level1Door1");
 
-        doorOpen = new Animation(500, false);
-        doorOpen.addFrame(closedDoor);
-        doorOpen.addFrame(new Frame(830, 0, "level1Door2"));
-        doorOpen.addFrame(new Frame(830, 0, "level1Door3"));
-        doorOpen.addFrame(new Frame(830, 0, "level1Door4"));
-        doorOpen.addFrame(new Frame(830, 30, "level1Door5"));
+//        doorOpen = new Animation(500, false);
+//        doorOpen.addFrame(closedDoor);
+//        doorOpen.addFrame(new Frame(830, 0, "level1Door2"));
+//        doorOpen.addFrame(new Frame(830, 0, "level1Door3"));
+//        doorOpen.addFrame(new Frame(830, 0, "level1Door4"));
+//        doorOpen.addFrame(new Frame(830, 30, "level1Door5"));
 
         pipePuzzle = new PipePuzzle(ctrl, mouseCursor);
 
@@ -102,6 +106,10 @@ public class Level1 {
         inventoryHoverLabel = "";
 
         nextLevelDoor = new RECT(860, 46, 1197, 435, "nextLevel", doorHoverLabel);
+
+        commands = new ArrayList<>();
+        interpreter = new Interpreter(ctrl, commands);
+        readCommands();
     }
 
     // Methods
@@ -163,9 +171,10 @@ public class Level1 {
         if (startAnim) {
             if (!musicPlaying) {
                 musicPlaying = true;
-                Sound sound = new Sound("puzzleComplete");
-                sound.resetWAV();
-                sound.playWAV();
+//                Sound sound = new Sound("puzzleComplete");
+//                sound.resetWAV();
+//                sound.playWAV();
+                interpreter.checkCommand(commands.get(1));
             }
 
             doorAnimation();
@@ -173,15 +182,19 @@ public class Level1 {
         } else
             ctrl.addSpriteToFrontBuffer(closedDoor);
 
-        ctrl.addSpriteToFrontBuffer(backgroundSprite);
+//        ctrl.addSpriteToFrontBuffer(backgroundSprite);
+        interpreter.checkCommand(commands.get(0));
+
         ctrl.addSpriteToFrontBuffer(textBox);
 
         ctrl.addSpriteToFrontBuffer(puzzleSprite);
 
         if (pipePuzzle.isPuzzleSolved() && !holdingItem && !startAnim && !inInventory) {
-            ctrl.addSpriteToFrontBuffer(itemSprite);
+            interpreter.checkCommand(commands.get(3));
+//            ctrl.addSpriteToFrontBuffer(itemSprite);
             itemRect = new RECT(itemSprite.getX(), 516, 1764, 548, itemRect.getTag(),
                     itemRect.getHoverLabel());
+
         } else if (pipePuzzle.isPuzzleSolved() && inInventory)
             ctrl.addSpriteToHudBuffer(itemSprite);
         else if (pipePuzzle.isPuzzleSolved() && holdingItem) {
@@ -201,7 +214,7 @@ public class Level1 {
 
     private void drawAnimatedText() {
         for (int i = 0; i < wrap.size(); i++) {
-            aTextList.add(new AText(wrap.get(i), 20));
+            aTextList.add(new AText(wrap.get(i), 20, ctrl));
             String test = aTextList.get(i).getCurrentStr();
             ctrl.drawString(70, 790 + (i * 20), test, Color.black);
         }
@@ -257,20 +270,20 @@ public class Level1 {
                 if (!pipePuzzle.isPuzzleSolved()) {
                     doorDialog = "The puzzle has not yet been solved. Try solving the puzzle to open the door.";
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 183);
+                    wrap = aText.wrapText(doorDialog);
                 } else if (pipePuzzle.isPuzzleSolved() && !holdingItem && !startAnim) {
                     doorDialog = "An item is needed to open this door. Look around for something that looks " +
                             "like a gold key.";
 
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 200);
+                    wrap = aText.wrapText(doorDialog);
                 } else if (pipePuzzle.isPuzzleSolved() && holdingItem) {
                     startAnim = true;
 
                     doorDialog = "";
 
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 200);
+                    wrap = aText.wrapText(doorDialog);
                     holdingItem = false;
                 } else if (pipePuzzle.isPuzzleSolved() && startAnim)
                     nextLevel = true;
@@ -282,7 +295,7 @@ public class Level1 {
                     puzzleDialog = "The puzzle has already been solved. Find an item to open the door.";
 
                     aTextList.clear();
-                    wrap = aText.wrapText(puzzleDialog, 200);
+                    wrap = aText.wrapText(puzzleDialog);
                 }
             }
             if (itemRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && !holdingItem) {
@@ -308,9 +321,23 @@ public class Level1 {
     }
 
     private void doorAnimation() {
-        Frame curFrame = doorOpen.getCurrentFrame();
-        if (curFrame != null)
-            ctrl.addSpriteToFrontBuffer(curFrame);
+//        Frame curFrame = doorOpen.getCurrentFrame();
+//        if (curFrame != null)
+//            ctrl.addSpriteToFrontBuffer(curFrame);
+        interpreter.checkCommand(commands.get(2));
+    }
+
+    private void readCommands() {
+        EZFileRead ezr = new EZFileRead("level1Script.txt");
+        for (int i = 0; i < ezr.getNumLines(); i++) {
+            String raw = ezr.getLine(i);
+            raw = raw.trim();
+            if (!raw.equals("")) {
+                boolean b = raw.charAt(0) == '#';
+                if (!b)
+                    commands.add(new Command(raw));
+            }
+        }
     }
 }
 

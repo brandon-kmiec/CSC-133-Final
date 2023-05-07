@@ -7,72 +7,37 @@ import FileIO.EZFileWrite;
 import Input.Mouse;
 import Inventory.Inventory;
 import Levels.*;
-import Particles.*;
-import Puzzles.PipePuzzle;
-import Puzzles.SimonSays;
-import ScriptingEngine.Interpreter;
+//import ScriptingEngine.Interpreter;
 import Sound.Sound;
 import logic.Control;
-import Graphics.Sprites;
-import timer.stopWatchX;
-import Graphics.Graphic;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 public class Main {
     // Fields (Static) below...
-    public static Rain rain;
-    public static Smoke smoke;
-    public static Snow snow;
-    public static Firework firework;
-
-    public static String s = "";
-    public static String s2 = "";
+    private static String s2 = "";
     private static int[] buffer;
     private static RECT disk;
     private static RECT load;
-
     private static final int dropShadow = 2;
-    private static Interpreter interpreter;
-    public static AText aText = new AText("This is a test of text in the console box...", 20);
-    public static Sound song = new Sound("persephone_farewell");
-    public static Sound sfx = new Sound("funny_death");
+    //    private static Interpreter interpreter;
+    private static TitleScreen titleScreen;
+    private static Level1 level1;
+    private static Level2 level2;
+    private static Level3 level3;
+    private static FinishScreen finishScreen;
+    private static Sprite nextLevel, prevLevel;
+    private static RECT nextLevelRect, prevLevelRect;
+    private static Inventory inventory;
+    private static Instant start;
+    private static boolean stopTime = false;
+    private static Sound backgroundMusic;
 
-    public static Sprite rotatedImage, scaledImage;
-    public static stopWatchX timer1 = new stopWatchX(10);
-    public static stopWatchX timer2 = new stopWatchX(100);
-    public static double rotate = 0.0;
-    public static double scale = 1.0;
-    public static boolean isScaleUp = true;
-
-    public static TitleScreen titleScreen;
-    public static Level1 level1;
-    public static Level2 level2;
-    public static Level3 level3;
-    public static FinishScreen finishScreen;
-
-    public static Sprite nextLevel, prevLevel;
-    public static RECT nextLevelRect, prevLevelRect;
-
-    public static Inventory inventory;
-
-    public static Instant start, stop;
-    public static Duration timeDifference;
-    public static boolean stopTime = false;
-
-    public static Sound backgroundMusic;
 
     public static void main(String[] args) {
         updateArtScript();
@@ -83,6 +48,8 @@ public class Main {
     /* This is your access to things BEFORE the game loop starts */
     public static void start(Control ctrl) {
         // TODO: Code your starting conditions here...NOT DRAW CALLS HERE! (no addSprite or drawString)
+        start = Instant.now();
+
         inventory = new Inventory(ctrl);
 
         titleScreen = new TitleScreen(ctrl);
@@ -91,18 +58,9 @@ public class Main {
         level2 = new Level2(ctrl, inventory);
         level3 = new Level3(ctrl, inventory);
         finishScreen = new FinishScreen(ctrl);
-//        level2.setLevelActive(true);
-//        level3.setLevelActive(true);
-//        finishScreen.setLevelActive(true);
-        start = Instant.now();
 
         backgroundMusic = new Sound("backgroundMusic");
         backgroundMusic.setLoop();
-
-        rain = new Rain(-50, 0, 1200, 90, 25, 60, 150);
-        smoke = new Smoke(500, 500, 25, 10, 10, 275, 500, true);
-        snow = new Snow(-50, 0, 1350, 90, 50, 250, 150);
-        firework = new Firework(200, 1000, 1720, 100, 25, 75, 5);
 
         ctrl.hideDefaultCursor();
 
@@ -113,17 +71,8 @@ public class Main {
         prevLevelRect = new RECT(1700, 928, 1828, 1056, "previous Level", "Previous Level",
                 new Frame(1700, 928, "prevLevelHover"));
 
-        // TODO: 4/19/2023 Affine Transform
-//        BufferedImage wheel = ctrl.getSpriteFromBackBuffer("wheel").getSprite();
-//        rotatedImage = new Sprite(100, 100, wheel, "rWheel");
-//        scaledImage = new Sprite(500, 100, wheel, "sWheel");
 
-
-        // TODO: 4/19/2023 sound
-//        song.setLoop();
-
-
-        // TODO: 4/19/2023 interpreter and save
+        // TODO: 4/19/2023 interpreter
 //        EZFileRead ezr = new EZFileRead("script.txt");
 //        ArrayList<Command> commands = new ArrayList<>();
 //        for (int i = 0; i < ezr.getNumLines(); i++) {
@@ -135,6 +84,7 @@ public class Main {
 //                    commands.add(new Command(raw));
 //            }
 //        }
+//        interpreter = new Interpreter(ctrl, commands);
 
         disk = new RECT(50, 50, 114, 114, "savetag", "Save Game",
                 new Frame(100, 50, "saveIcon2Hover"));
@@ -146,7 +96,6 @@ public class Main {
             buffer[i] = value;
         }
 
-//        interpreter = new Interpreter(ctrl, commands);
     }
 
     /* This is your access to the "game loop" (It is a "callback" method from the Control class (do NOT modify that class!))*/
@@ -238,8 +187,8 @@ public class Main {
             finishScreen.runLevel();
             backgroundMusic.pauseWAV();
             if (!stopTime) {
-                stop = Instant.now();
-                timeDifference = Duration.between(start, stop);
+                Instant stop = Instant.now();
+                Duration timeDifference = Duration.between(start, stop);
                 stopTime = true;
                 finishScreen.setCompleteTime(timeDifference);
             }
@@ -257,71 +206,11 @@ public class Main {
         }
 
 
-        // TODO: 4/19/2023 Affine Transform
-//        if (timer1.isTimeUp()) {
-//            rotate += 1.0;
-//            if (rotate > 360.0)
-//                rotate = 0.0;
-//            BufferedImage newRotate = Graphic.rotateImageByDegrees(ctrl.getSpriteFromBackBuffer("wheel").getSprite(), rotate);
-//            rotatedImage = new Sprite(100, 100, newRotate, "rWheel");
-//            timer1.resetWatch();
-//        }
-//        if (timer2.isTimeUp()) {
-//            if (isScaleUp) {
-//                scale += 0.05;
-//                if (scale >= 1.25) {
-//                    scale = 1.25;
-//                    isScaleUp = !isScaleUp;
-//                }
-//            } else {
-//                scale -= 0.05;
-//                if (scale < 0.75) {
-//                    scale = 0.75;
-//                    isScaleUp = !isScaleUp;
-//                }
-//            }
-//            BufferedImage newScale = Graphic.scale(ctrl.getSpriteFromBackBuffer("wheel").getSprite(), scale);
-//            scaledImage = new Sprite(500, 100, newScale, "sWheel");
-//            timer2.resetWatch();
-//        }
-//        ctrl.addSpriteToFrontBuffer(rotatedImage);
-//        ctrl.addSpriteToFrontBuffer(scaledImage);
-//        ctrl.drawString(260, 25, "Affine Transforms", Color.white);
-//        ctrl.drawString(125, 235, "Rotate", Color.white);
-//        ctrl.drawString(525, 235, "Scale", Color.white);
-
-
-        // TODO: 4/19/2023 particles
-        //UpdateParticles rainParticles = new UpdateParticles(ctrl, true, rain.getParticleSystem());
-        //UpdateParticles smokeParticles = new UpdateParticles(ctrl, true, smoke.getParticleSystem());
-//        UpdateParticles snowParticles = new UpdateParticles(ctrl, true, snow.getParticleSystem());
-
-        // TODO: 4/26/2023 Firework Particles
-//        UpdateParticles fireworkParticles = new UpdateParticles(ctrl, true, firework.getParticleSystem());
-//        for (int i = 0; i < firework.explosions.length; i++)
-//            if (firework.explosions[i] != null)
-//                new UpdateParticles(ctrl, false, firework.explosions[i].getParticleSystem());
-
-
-        // TODO: 4/19/2023 HUD
-//        ctrl.drawString(150, 300, "Text Underneath", Color.red);
-//        ctrl.addSpriteToHudBuffer(200, 200, "my_hud");
-//        ctrl.drawHudString(220, 270, "HUD data here...", Color.white);
-
-
-        // TODO: 4/19/2023 animated text
-//        ctrl.addSpriteToFrontBuffer(0, 0, "gui_bg");
-//
-//        String s = aText.getCurrentStr();
-//        ctrl.drawString(20, 480, s, Color.black);
-//
-//        Point p = Mouse.getMouseCoords();
-//        ctrl.addSpriteToOverlayBuffer(p.x, p.y, "cursor");
-
-        // TODO: 4/19/2023 interpreter and save
+        // TODO: 4/19/2023 interpreter
 //        interpreter.checkCommands();
 
 
+        String s;
         if (!titleScreen.isLevelActive()) {
             ctrl.addSpriteToFrontBuffer(50, 50, "saveIcon2");
 
@@ -366,23 +255,19 @@ public class Main {
         File[] artList = artDirectory.listFiles();
         EZFileWrite updateArt = new EZFileWrite("Art.txt");
 
-        if (artList != null) {
-            for (File file : artList) {
-                //System.out.println(file.getName());
+        if (artList != null)
+            for (File file : artList)
                 updateArt.writeLine("Art/" + file.getName() + "*" + file.getName().substring(0, file.getName().indexOf('.')));
-                //System.out.println("Art/" + file.getName() + "*" + file.getName().substring(0, file.getName().indexOf('.')));
-            }
-        }
         updateArt.saveFile();
     }
 
     public static void saveData() {
-        String out = "";
-        for (int i = 0; i < buffer.length; i++)
-            out += buffer[i] + "*";
-        out = out.substring(0, out.length() - 1);
+        StringBuilder out = new StringBuilder();
+        for (int j : buffer)
+            out.append(j).append("*");
+        out = new StringBuilder(out.substring(0, out.length() - 1));
         EZFileWrite ezw = new EZFileWrite("save.txt");
-        ezw.writeLine(out);
+        ezw.writeLine(out.toString());
         ezw.saveFile();
     }
 

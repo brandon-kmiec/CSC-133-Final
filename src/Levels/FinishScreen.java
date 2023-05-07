@@ -29,6 +29,7 @@ public class FinishScreen {
     private final Sprite mouseCursor;
     private static Firework firework;
     private static String temp;
+    private static int count;
 
     // Constructor
     public FinishScreen(Control ctrl) {
@@ -48,6 +49,8 @@ public class FinishScreen {
         completeTime = null;
 
         firework = new Firework(200, 1000, 1720, 100, 25, 75, 5);
+
+        count = 0;
     }
 
     // Methods
@@ -113,10 +116,14 @@ public class FinishScreen {
             ctrl.addSpriteToFrontBuffer(sprite);
         }
 
-        UpdateParticles fireworkParticles = new UpdateParticles(ctrl, true, firework.getParticleSystem());
-        for (int i = 0; i < firework.explosions.length; i++)
-            if (firework.explosions[i] != null)
-                new UpdateParticles(ctrl, false, firework.explosions[i].getParticleSystem());
+        if (count < 10000) {
+            UpdateParticles fireworkParticles = new UpdateParticles(ctrl, true, firework.getParticleSystem());
+            for (int i = 0; i < firework.explosions.length; i++)
+                if (firework.explosions[i] != null) {
+                    new UpdateParticles(ctrl, false, firework.explosions[i].getParticleSystem());
+                    count++;
+                }
+        }
 
         mouseCursor.moveXAbsolute(p.x - 16);
         mouseCursor.moveYAbsolute(p.y - 18);

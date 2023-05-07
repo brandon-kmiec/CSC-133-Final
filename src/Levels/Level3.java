@@ -2,9 +2,11 @@ package Levels;
 
 import Data.*;
 import Data.Frame;
+import FileIO.EZFileRead;
 import Graphics.Graphic;
 import Input.Mouse;
 import Inventory.Inventory;
+import ScriptingEngine.Interpreter;
 import Sound.Sound;
 import logic.Control;
 
@@ -17,12 +19,12 @@ public class Level3 {
     private final RECT nextLevelDoor;
     private RECT itemRect;
     private final RECT stickFigureRect;
-    private final Sprite textBox;
-    private final Sprite backgroundSprite;
+//    private final Sprite textBox;
+//    private final Sprite backgroundSprite;
     private final Sprite itemSprite;
     private final Sprite mouseCursor;
     private final Sprite stickFigure;
-    private final Sprite boat;
+//    private final Sprite boat;
     private String doorHoverLabel;
     private String stickFigureHoverLabel;
     private String doorDialog;
@@ -40,6 +42,8 @@ public class Level3 {
     private final ArrayList<AText> aTextList;
     private ArrayList<String> wrap;
     private final RECT[] inventorySlots;
+    private final ArrayList<Command> commands;
+    private final Interpreter interpreter;
 
     // Constructor
     public Level3(Control ctrl, Inventory inventory) {
@@ -55,14 +59,14 @@ public class Level3 {
         complete = false;
         fedBurger = false;
 
-        aText = new AText("", 20);
+        aText = new AText("", 20, ctrl);
         aTextList = new ArrayList<>();
         wrap = new ArrayList<>();
 
-        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level3Background").getSprite(),
-                "background");
-        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
-                "textBox");
+//        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level3Background").getSprite(),
+//                "background");
+//        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
+//                "textBox");
 
         stickFigure = new Sprite(670, 700, ctrl.getSpriteFromBackBuffer("stickFigure").getSprite(),
                 "Stick Figure");
@@ -83,8 +87,12 @@ public class Level3 {
         itemHoverLabel = "";
         inventoryHoverLabel = "";
 
-        boat = new Sprite(500, 500, ctrl.getSpriteFromBackBuffer("boat").getSprite(), "boat");
+//        boat = new Sprite(500, 500, ctrl.getSpriteFromBackBuffer("boat").getSprite(), "boat");
         nextLevelDoor = new RECT(500, 500, 628, 581, "boat", "Boat");
+
+        commands = new ArrayList<>();
+        interpreter = new Interpreter(ctrl, commands);
+        readCommands();
     }
 
     // Methods
@@ -120,17 +128,22 @@ public class Level3 {
     private void drawSprites() {
         Point p = Mouse.getMouseCoords();
 
-        ctrl.addSpriteToFrontBuffer(backgroundSprite);
+//        ctrl.addSpriteToFrontBuffer(backgroundSprite);
+        interpreter.checkCommand(commands.get(0));
 
-        ctrl.addSpriteToFrontBuffer(boat);
+//        ctrl.addSpriteToFrontBuffer(boat);
+        interpreter.checkCommand(commands.get(1));
 
-        ctrl.addSpriteToFrontBuffer(textBox);
+//        ctrl.addSpriteToFrontBuffer(textBox);
+        interpreter.checkCommand(commands.get(2));
 
         ctrl.addSpriteToFrontBuffer(stickFigure);
 
         if (!fedBurger) {
             if (!holdingItem && !inInventory) {
-                ctrl.addSpriteToFrontBuffer(itemSprite);
+//                ctrl.addSpriteToFrontBuffer(itemSprite);
+                interpreter.checkCommand(commands.get(3));
+
                 itemRect = new RECT(itemSprite.getX(), itemSprite.getY(), itemSprite.getX() + 128,
                         itemSprite.getY() + 128, itemRect.getTag(), itemRect.getHoverLabel());
             } else if (inInventory)
@@ -153,7 +166,7 @@ public class Level3 {
 
     private void drawAnimatedText() {
         for (int i = 0; i < wrap.size(); i++) {
-            aTextList.add(new AText(wrap.get(i), 20));
+            aTextList.add(new AText(wrap.get(i), 20, ctrl));
             String test = aTextList.get(i).getCurrentStr();
             ctrl.drawString(70, 790 + (i * 20), test, Color.black);
         }
@@ -207,11 +220,11 @@ public class Level3 {
                 if (!fedBurger) {
                     doorDialog = "This is not your boat. Try talking to the stick figure.";
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 183);
+                    wrap = aText.wrapText(doorDialog);
                 } else {
                     doorDialog = "";
                     aTextList.clear();
-                    wrap = aText.wrapText(doorDialog, 200);
+                    wrap = aText.wrapText(doorDialog);
                     holdingItem = false;
                     nextLevel = true;
                 }
@@ -221,11 +234,11 @@ public class Level3 {
                 if (!fedBurger && !holdingItem) {
                     puzzleDialog = "I will let you use my boat in exchange for a Cheese Burger.";
                     aTextList.clear();
-                    wrap = aText.wrapText(puzzleDialog, 200);
+                    wrap = aText.wrapText(puzzleDialog);
                 } else if (holdingItem) {
                     puzzleDialog = "Thank you for the food!  You are free to use the boat.";
                     aTextList.clear();
-                    wrap = aText.wrapText(puzzleDialog, 200);
+                    wrap = aText.wrapText(puzzleDialog);
                     holdingItem = false;
                     fedBurger = true;
                     complete = true;
@@ -236,7 +249,7 @@ public class Level3 {
                 } else {
                     puzzleDialog = "Thank you for the food!  You are free to use the boat.";
                     aTextList.clear();
-                    wrap = aText.wrapText(puzzleDialog, 200);
+                    wrap = aText.wrapText(puzzleDialog);
                 }
             }
 
@@ -258,6 +271,19 @@ public class Level3 {
                     inInventory = false;
                     inventorySlots[i].changeHoverLabel("Inventory Slot #" + (i + 1));
                 }
+            }
+        }
+    }
+
+    private void readCommands() {
+        EZFileRead ezr = new EZFileRead("level3Script.txt");
+        for (int i = 0; i < ezr.getNumLines(); i++) {
+            String raw = ezr.getLine(i);
+            raw = raw.trim();
+            if (!raw.equals("")) {
+                boolean b = raw.charAt(0) == '#';
+                if (!b)
+                    commands.add(new Command(raw));
             }
         }
     }

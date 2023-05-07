@@ -1,0 +1,4 @@
+load_bg: level1Background
+play_music: puzzleComplete
+start_animation: 500, false, 830, 30, level1Door1, level1Door2, level1Door3, level1Door4, level1Door5
+show_sprite: 1700, 500, key

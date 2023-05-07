@@ -9,6 +9,7 @@
 #play_music_loop: fileName
 #start_animation: delay, isLooping, x, y, spriteTag1, spriteTag2, ...   # Need at least 2 sprite tags
 
+
 load_bg: forest
 
 #text: Howdy Partner!

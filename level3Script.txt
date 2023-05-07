@@ -1,0 +1,4 @@
+load_bg: level3Background
+show_sprite: 500, 500, boat
+show_sprite: 64, 760, textBox
+show_sprite: 1500, 750, cheeseBurger

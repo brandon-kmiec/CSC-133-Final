@@ -1,16 +1,15 @@
 package Levels;
 
-import Data.Click;
-import Data.RECT;
-import Data.Sprite;
-import Data.gameString;
+import Data.*;
 import FileIO.EZFileRead;
 import Input.Mouse;
+import ScriptingEngine.Interpreter;
 import logic.Control;
 import Graphics.Graphic;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class TitleScreen {
     // Fields
@@ -22,6 +21,8 @@ public class TitleScreen {
     private final RECT leaderboardRect;
     private String hoverText;
     private final Sprite mouseCursor;
+    private final ArrayList<Command> commands;
+    private final Interpreter interpreter;
 
     // Constructor
     public TitleScreen(Control ctrl) {
@@ -35,6 +36,10 @@ public class TitleScreen {
         leaderboardRect = new RECT(968, 682, 1844, 841, "leaderboard");
 
         hoverText = "";
+
+        commands = new ArrayList<>();
+        interpreter = new Interpreter(ctrl, commands);
+        readCommands();
     }
 
     // Methods
@@ -54,7 +59,9 @@ public class TitleScreen {
         Point p = Mouse.getMouseCoords();
 
 
-        ctrl.addSpriteToFrontBuffer(0, 0, "titleScreen");
+//        ctrl.addSpriteToFrontBuffer(0, 0, "titleScreen");
+        interpreter.checkCommand(commands.get(0));
+
 
         mouseCursor.moveXAbsolute(p.x - 16);
         mouseCursor.moveYAbsolute(p.y - 18);
@@ -140,5 +147,18 @@ public class TitleScreen {
 
         Sprite sprite = new Sprite(0, 0, leaderboard, "leaderboard");
         ctrl.addSpriteToFrontBuffer(sprite);
+    }
+
+    private void readCommands() {
+        EZFileRead ezr = new EZFileRead("titleScreenScript.txt");
+        for (int i = 0; i < ezr.getNumLines(); i++) {
+            String raw = ezr.getLine(i);
+            raw = raw.trim();
+            if (!raw.equals("")) {
+                boolean b = raw.charAt(0) == '#';
+                if (!b)
+                    commands.add(new Command(raw));
+            }
+        }
     }
 }
