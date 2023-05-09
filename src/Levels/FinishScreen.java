@@ -174,6 +174,9 @@ public class FinishScreen {
                     ezr.getNextLine();
                 }
 
+                if (!timeAdded)
+                    timeList.add((int) totalTime);
+
                 EZFileWrite ezw = new EZFileWrite("leaderboard.txt");
                 for (Integer integer : timeList)
                     ezw.writeLine(String.valueOf(integer));
@@ -190,11 +193,16 @@ public class FinishScreen {
         StringTokenizer st = new StringTokenizer(str, "*");
         levelActive = Boolean.parseBoolean(st.nextToken());
         leaderboardAlreadyClicked = Boolean.parseBoolean(st.nextToken());
-        completeTime = Duration.parse(st.nextToken());
 
         String temp = st.nextToken();
         if (!temp.equals("null"))
-            elapsedTime = Duration.parse(st.nextToken());
+            completeTime = Duration.parse(temp);
+        else
+            completeTime = null;
+
+        temp = st.nextToken();
+        if (!temp.equals("null"))
+            elapsedTime = Duration.parse(temp);
         else
             elapsedTime = null;
     }
