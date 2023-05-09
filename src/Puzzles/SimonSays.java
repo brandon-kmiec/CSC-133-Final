@@ -91,6 +91,9 @@ public class SimonSays {
     public void drawSequence(Sprite sprite) {
         ctrl.addSpriteToFrontBuffer(sprite);
 
+        ctrl.drawString(playSequenceRect.getX1(), playSequenceRect.getY1() - 20,
+                "Simon Says: Repeat the shown sequence.", Color.WHITE);
+
         Point p = Mouse.getMouseCoords();
 
         mouseCursor.moveXAbsolute(p.x - 16);

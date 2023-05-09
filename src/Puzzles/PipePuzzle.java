@@ -103,7 +103,9 @@ public class PipePuzzle {
         return solved;
     }
 
-    public void setPuzzleSolved(boolean puzzleSolved) {this.solved = puzzleSolved;}
+    public void setPuzzleSolved(boolean puzzleSolved) {
+        this.solved = puzzleSolved;
+    }
 
     public boolean isExitPuzzle() {
         return exitPuzzle;
@@ -132,6 +134,9 @@ public class PipePuzzle {
 
     public void drawPuzzle(Sprite sprite) {
         ctrl.addSpriteToFrontBuffer(sprite);
+
+        ctrl.drawString(576, 126,
+                "Pipe Puzzle: Connect both ends.  Click two pipes to swap them.", Color.WHITE);
 
         Point p = Mouse.getMouseCoords();
 
