@@ -12,6 +12,7 @@ import logic.Control;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class Level3 {
     // Fields
@@ -19,12 +20,12 @@ public class Level3 {
     private final RECT nextLevelDoor;
     private RECT itemRect;
     private final RECT stickFigureRect;
-//    private final Sprite textBox;
-//    private final Sprite backgroundSprite;
+    //    private final Sprite textBox;
+    //    private final Sprite backgroundSprite;
     private final Sprite itemSprite;
     private final Sprite mouseCursor;
     private final Sprite stickFigure;
-//    private final Sprite boat;
+    //    private final Sprite boat;
     private String doorHoverLabel;
     private String stickFigureHoverLabel;
     private String doorDialog;
@@ -44,6 +45,7 @@ public class Level3 {
     private final RECT[] inventorySlots;
     private final ArrayList<Command> commands;
     private final Interpreter interpreter;
+    private int invSlotNum;
 
     // Constructor
     public Level3(Control ctrl, Inventory inventory) {
@@ -136,6 +138,7 @@ public class Level3 {
 
 //        ctrl.addSpriteToFrontBuffer(textBox);
         interpreter.checkCommand(commands.get(2));
+        interpreter.checkCommand(commands.get(4));
 
         ctrl.addSpriteToFrontBuffer(stickFigure);
 
@@ -261,12 +264,13 @@ public class Level3 {
                 if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && holdingItem) {
                     inInventory = true;
                     holdingItem = false;
+                    invSlotNum = i;
 
                     RECT clickedRect = inventorySlots[i];
                     itemSprite.moveXAbsolute(clickedRect.getX1());
                     itemSprite.moveYAbsolute(clickedRect.getY1());
-                    inventorySlots[i].changeHoverLabel(itemRect.getTag());
-                } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory) {
+                    inventorySlots[i].changeHoverLabel(itemRect.getHoverLabel());
+                } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory && invSlotNum == i) {
                     holdingItem = true;
                     inInventory = false;
                     inventorySlots[i].changeHoverLabel("Inventory Slot #" + (i + 1));
@@ -285,6 +289,29 @@ public class Level3 {
                 if (!b)
                     commands.add(new Command(raw));
             }
+        }
+    }
+
+    public String saveData() {
+        return levelActive + "*" + holdingItem + "*" + nextLevel + "*" + inInventory + "*" + changeMouse + "*" +
+                complete + "*" + fedBurger + "*" + itemSprite.getX() + "*" + itemSprite.getY() + "*" + invSlotNum;
+    }
+
+    public void loadData(String str) {
+        StringTokenizer st = new StringTokenizer(str, "*");
+        levelActive = Boolean.parseBoolean(st.nextToken());
+        holdingItem = Boolean.parseBoolean(st.nextToken());
+        nextLevel = Boolean.parseBoolean(st.nextToken());
+        inInventory = Boolean.parseBoolean(st.nextToken());
+        changeMouse = Boolean.parseBoolean(st.nextToken());
+        complete = Boolean.parseBoolean(st.nextToken());
+        fedBurger = Boolean.parseBoolean(st.nextToken());
+
+        if (inInventory) {
+            itemSprite.moveXAbsolute(Integer.parseInt(st.nextToken()));
+            itemSprite.moveYAbsolute(Integer.parseInt(st.nextToken()));
+            invSlotNum = Integer.parseInt(st.nextToken());
+            inventorySlots[invSlotNum].changeHoverLabel(itemRect.getHoverLabel());
         }
     }
 }

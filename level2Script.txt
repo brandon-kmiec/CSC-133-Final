@@ -1,3 +1,4 @@
 load_bg: level2Background
 show_sprite: 1700, 500, dynamite
 show_sprite: 64, 760, textBox
+text_hover_rect: 64, 760, 576, 1272, textBox, Text Box

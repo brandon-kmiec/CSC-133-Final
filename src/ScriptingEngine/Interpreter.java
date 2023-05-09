@@ -14,8 +14,8 @@ public class Interpreter {
     private static final int dropShadow = 2;
     private final Control ctrl;
     private static String hoverLabelStr;
-    private static String tagStr;
-    private ArrayList<Command> commands = new ArrayList<>();
+//    private static String tagStr;
+    private final ArrayList<Command> commands;
     private static ArrayList<Command> rectCommands;
     private static boolean musicPlaying;
     private boolean animationPlaying;
@@ -26,7 +26,7 @@ public class Interpreter {
         this.commands = commands;
         this.ctrl = ctrl;
         hoverLabelStr = "";
-        tagStr = "";
+//        tagStr = "";
         rectCommands = new ArrayList<>();
         musicPlaying = false;
         animationPlaying = false;
@@ -65,7 +65,7 @@ public class Interpreter {
 
                     animationPlaying = true;
                 }
-                startAnimation(c);
+                startAnimation();
             }
         }
 
@@ -105,7 +105,7 @@ public class Interpreter {
 
                 animationPlaying = true;
             }
-            startAnimation(c);
+            startAnimation();
         }
 //        }
 
@@ -151,16 +151,16 @@ public class Interpreter {
             else
                 hoverLabelStr = "";
 
-            if (Control.getMouseInput() != null)
-                if (testRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
-                    tagStr = testRect.getTag() + " was clicked";
-                    break;
-                } else
-                    tagStr = "";
+//            if (Control.getMouseInput() != null)
+//                if (testRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+//                    tagStr = testRect.getTag() + " was clicked";
+//                    break;
+//                } else
+//                    tagStr = "";
 
             ctrl.drawString(x, (y - 2), hoverLabelStr, Color.BLACK);
             ctrl.drawString(x - dropShadow, (y - dropShadow) - 2, hoverLabelStr, Color.yellow);
-            ctrl.drawString(150, 800, tagStr, Color.WHITE);
+//            ctrl.drawString(150, 800, tagStr, Color.WHITE);
         }
     }
 
@@ -194,7 +194,7 @@ public class Interpreter {
         }
     }
 
-    private void startAnimation(Command c) {
+    private void startAnimation() {
         if (animationPlaying) {
             Frame curFrame = animation.getCurrentFrame();
             if (curFrame != null)

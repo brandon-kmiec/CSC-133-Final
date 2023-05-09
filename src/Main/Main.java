@@ -7,7 +7,6 @@ import FileIO.EZFileWrite;
 import Input.Mouse;
 import Inventory.Inventory;
 import Levels.*;
-//import ScriptingEngine.Interpreter;
 import Sound.Sound;
 import logic.Control;
 
@@ -16,16 +15,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.StringTokenizer;
 
 public class Main {
     // Fields (Static) below...
     private static String s2 = "";
-    private static int[] buffer;
     private static RECT disk;
     private static RECT load;
     private static final int dropShadow = 2;
-    //    private static Interpreter interpreter;
     private static TitleScreen titleScreen;
     private static Level1 level1;
     private static Level2 level2;
@@ -37,6 +33,7 @@ public class Main {
     private static Instant start;
     private static boolean stopTime = false;
     private static Sound backgroundMusic;
+    private static Duration timeElapsed;
 
 
     public static void main(String[] args) {
@@ -71,31 +68,10 @@ public class Main {
         prevLevelRect = new RECT(1700, 928, 1828, 1056, "previous Level", "Previous Level",
                 new Frame(1700, 928, "prevLevelHover"));
 
-
-        // TODO: 4/19/2023 interpreter
-//        EZFileRead ezr = new EZFileRead("script.txt");
-//        ArrayList<Command> commands = new ArrayList<>();
-//        for (int i = 0; i < ezr.getNumLines(); i++) {
-//            String raw = ezr.getLine(i);
-//            raw = raw.trim();
-//            if (!raw.equals("")) {
-//                boolean b = raw.charAt(0) == '#';
-//                if (!b)
-//                    commands.add(new Command(raw));
-//            }
-//        }
-//        interpreter = new Interpreter(ctrl, commands);
-
         disk = new RECT(50, 50, 114, 114, "savetag", "Save Game",
                 new Frame(100, 50, "saveIcon2Hover"));
         load = new RECT(200, 50, 264, 114, "loadtag", "Load Game",
                 new Frame(200, 50, "loadIconHover"));
-        buffer = new int[40];
-        for (int i = 0; i < buffer.length; i++) {
-            int value = (int) (Math.random() * 100);
-            buffer[i] = value;
-        }
-
     }
 
     /* This is your access to the "game loop" (It is a "callback" method from the Control class (do NOT modify that class!))*/
@@ -116,6 +92,7 @@ public class Main {
                 ctrl.drawHudString(x, (y - 2), nextLevelRect.getHoverLabel(), Color.BLACK);
                 ctrl.drawHudString(x - dropShadow, (y - dropShadow) - 2, nextLevelRect.getHoverLabel(), Color.yellow);
             }
+
             if (!level1.isLevelActive()) {
                 ctrl.addSpriteToHudBuffer(prevLevel);
                 if (prevLevelRect.isCollision(x, y)) {
@@ -190,8 +167,9 @@ public class Main {
                 Instant stop = Instant.now();
                 Duration timeDifference = Duration.between(start, stop);
                 stopTime = true;
-                finishScreen.setCompleteTime(timeDifference);
+                finishScreen.setCompleteTime(timeDifference, timeElapsed);
             }
+
             if (finishScreen.isRestartClicked()) {
                 finishScreen.setLevelActive(false);
                 inventory = new Inventory(ctrl);
@@ -204,11 +182,6 @@ public class Main {
                 backgroundMusic.restartWAV();
             }
         }
-
-
-        // TODO: 4/19/2023 interpreter
-//        interpreter.checkCommands();
-
 
         String s;
         if (!titleScreen.isLevelActive()) {
@@ -262,26 +235,36 @@ public class Main {
     }
 
     public static void saveData() {
-        StringBuilder out = new StringBuilder();
-        for (int j : buffer)
-            out.append(j).append("*");
-        out = new StringBuilder(out.substring(0, out.length() - 1));
+        Instant current = Instant.now();
+
+        if (timeElapsed != null)
+            timeElapsed = timeElapsed.plus(Duration.between(start, current));
+        else
+            timeElapsed = Duration.between(start, current);
+
         EZFileWrite ezw = new EZFileWrite("save.txt");
-        ezw.writeLine(out.toString());
+        ezw.writeLine(String.valueOf(timeElapsed));
+        ezw.writeLine(level1.saveData());
+        ezw.writeLine(level2.saveData());
+        ezw.writeLine(level3.saveData());
+        ezw.writeLine(finishScreen.saveData());
         ezw.saveFile();
     }
 
     public static void loadData() {
         EZFileRead ezr = new EZFileRead("save.txt");
         String raw = ezr.getLine(0);
-        StringTokenizer st = new StringTokenizer(raw, "*");
-        if (st.countTokens() != buffer.length)
-            return;
-        for (int i = 0; i < buffer.length; i++) {
-            String value = st.nextToken();
-            int val = Integer.parseInt(value);
-            buffer[i] = val;
-        }
+        timeElapsed = Duration.parse(raw);
+        raw = ezr.getLine(1);
+        level1.loadData(raw);
+        raw = ezr.getLine(2);
+        level2.loadData(raw);
+        raw = ezr.getLine(3);
+        level3.loadData(raw);
+        raw = ezr.getLine(4);
+        finishScreen.loadData(raw);
+
+        titleScreen.setLevelActive(false);
     }
 
     public static void drawQuit(Control ctrl, Point p) {

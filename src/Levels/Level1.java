@@ -14,6 +14,7 @@ import Graphics.Graphic;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class Level1 {
     // Fields
@@ -22,7 +23,7 @@ public class Level1 {
     private final RECT puzzle;
     private RECT itemRect;
     private final Sprite puzzleSprite;
-    private final Sprite textBox;
+//    private final Sprite textBox;
 //    private final Sprite backgroundSprite;
     private final Sprite itemSprite;
     private final Sprite mouseCursor;
@@ -50,6 +51,7 @@ public class Level1 {
     private final RECT[] inventorySlots;
     private final ArrayList<Command> commands;
     private final Interpreter interpreter;
+    private int invSlotNum;
 
     // Constructor
     public Level1(Control ctrl, Inventory inventory) {
@@ -73,8 +75,8 @@ public class Level1 {
 
 //        backgroundSprite = new Sprite(0, 0, ctrl.getSpriteFromBackBuffer("level1Background").getSprite(),
 //                "background");
-        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
-                "textBox");
+//        textBox = new Sprite(64, 760, ctrl.getSpriteFromBackBuffer("textBox").getSprite(),
+//                "textBox");
 
         puzzleSprite = new Sprite(320, 160, ctrl.getSpriteFromBackBuffer("puzzleSprite").getSprite(),
                 "puzzle");
@@ -117,9 +119,8 @@ public class Level1 {
         if (pipePuzzle.isPuzzleSolved() && pipePuzzle.isExitPuzzle()) {
             pipePuzzle.setPuzzleActive(false);
             puzzleActive = false;
-
         }
-        if (PipePuzzle.isPuzzleActive()) {
+        if (PipePuzzle.isPuzzleActive() || puzzleActive) {
             puzzleActive = true;
 
             BufferedImage levelBackground = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
@@ -185,7 +186,9 @@ public class Level1 {
 //        ctrl.addSpriteToFrontBuffer(backgroundSprite);
         interpreter.checkCommand(commands.get(0));
 
-        ctrl.addSpriteToFrontBuffer(textBox);
+//        ctrl.addSpriteToFrontBuffer(textBox);
+        interpreter.checkCommand(commands.get(4));
+        interpreter.checkCommand(commands.get(5));
 
         ctrl.addSpriteToFrontBuffer(puzzleSprite);
 
@@ -306,12 +309,13 @@ public class Level1 {
                 if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && holdingItem) {
                     inInventory = true;
                     holdingItem = false;
+                    invSlotNum = i;
 
                     RECT clickedRect = inventorySlots[i];
                     itemSprite.moveXAbsolute(clickedRect.getX1() + 32);
                     itemSprite.moveYAbsolute(clickedRect.getY1() + 32);
-                    inventorySlots[i].changeHoverLabel(itemRect.getTag());
-                } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory) {
+                    inventorySlots[i].changeHoverLabel(itemRect.getHoverLabel());
+                } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory && invSlotNum == i) {
                     holdingItem = true;
                     inInventory = false;
                     inventorySlots[i].changeHoverLabel("Inventory Slot #" + (i + 1));
@@ -337,6 +341,33 @@ public class Level1 {
                 if (!b)
                     commands.add(new Command(raw));
             }
+        }
+    }
+
+    public String saveData() {
+        return levelActive + "*" + startAnim + "*" + holdingItem + "*" + nextLevel + "*" + inInventory + "*" +
+                changeMouse + "*" + puzzleActive + "*" + pipePuzzle.isPuzzleSolved() + "*" + complete + "*" +
+                musicPlaying + "*" + itemSprite.getX() + "*" + itemSprite.getY() + "*" + invSlotNum;
+    }
+
+    public void loadData(String str) {
+        StringTokenizer st = new StringTokenizer(str, "*");
+        levelActive = Boolean.parseBoolean(st.nextToken());
+        startAnim = Boolean.parseBoolean(st.nextToken());
+        holdingItem = Boolean.parseBoolean(st.nextToken());
+        nextLevel = Boolean.parseBoolean(st.nextToken());
+        inInventory = Boolean.parseBoolean(st.nextToken());
+        changeMouse = Boolean.parseBoolean(st.nextToken());
+        puzzleActive = Boolean.parseBoolean(st.nextToken());
+        pipePuzzle.setPuzzleSolved(Boolean.parseBoolean(st.nextToken()));
+        complete = Boolean.parseBoolean(st.nextToken());
+        musicPlaying = Boolean.parseBoolean(st.nextToken());
+
+        if (inInventory) {
+            itemSprite.moveXAbsolute(Integer.parseInt(st.nextToken()));
+            itemSprite.moveYAbsolute(Integer.parseInt(st.nextToken()));
+            invSlotNum = Integer.parseInt(st.nextToken());
+            inventorySlots[invSlotNum].changeHoverLabel(itemRect.getHoverLabel());
         }
     }
 }

@@ -103,6 +103,8 @@ public class PipePuzzle {
         return solved;
     }
 
+    public void setPuzzleSolved(boolean puzzleSolved) {this.solved = puzzleSolved;}
+
     public boolean isExitPuzzle() {
         return exitPuzzle;
     }
@@ -111,8 +113,8 @@ public class PipePuzzle {
         return puzzleActive;
     }
 
-    public void setPuzzleActive(boolean puzzleActive) {
-        PipePuzzle.puzzleActive = puzzleActive;
+    public void setPuzzleActive(boolean isPuzzleActive) {
+        puzzleActive = isPuzzleActive;
     }
 
     private static void randomizeBoard() {
