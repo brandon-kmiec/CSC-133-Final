@@ -123,6 +123,7 @@ public class TitleScreen {
             long minutes = time / (60 * 1000) % 60;
             long hours = time / (60 * 60 * 1000) % 24;
 
+            // TODO: 5/8/2023 Implement a way to add a name with the time on the leaderboard
             String temp = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
 
             g.drawString(temp, gameString.getCenteredXPosition(g, font, temp, 0, 1919, 1), y);
