@@ -171,6 +171,7 @@ public class Main {
             }
 
             if (finishScreen.isRestartClicked()) {
+                timeElapsed = null;
                 finishScreen.setLevelActive(false);
                 inventory = new Inventory(ctrl);
                 titleScreen = new TitleScreen(ctrl);
@@ -253,18 +254,20 @@ public class Main {
 
     public static void loadData() {
         EZFileRead ezr = new EZFileRead("save.txt");
-        String raw = ezr.getLine(0);
-        timeElapsed = Duration.parse(raw);
-        raw = ezr.getLine(1);
-        level1.loadData(raw);
-        raw = ezr.getLine(2);
-        level2.loadData(raw);
-        raw = ezr.getLine(3);
-        level3.loadData(raw);
-        raw = ezr.getLine(4);
-        finishScreen.loadData(raw);
+        if (ezr.getNumLines() > 0) {
+            String raw = ezr.getLine(0);
+            timeElapsed = Duration.parse(raw);
+            raw = ezr.getLine(1);
+            level1.loadData(raw);
+            raw = ezr.getLine(2);
+            level2.loadData(raw);
+            raw = ezr.getLine(3);
+            level3.loadData(raw);
+            raw = ezr.getLine(4);
+            finishScreen.loadData(raw);
 
-        titleScreen.setLevelActive(false);
+            titleScreen.setLevelActive(false);
+        }
     }
 
     public static void drawQuit(Control ctrl, Point p) {
