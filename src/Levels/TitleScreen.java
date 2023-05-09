@@ -62,6 +62,7 @@ public class TitleScreen {
 //        ctrl.addSpriteToFrontBuffer(0, 0, "titleScreen");
         interpreter.checkCommand(commands.get(0));
 
+        ctrl.drawString(0, 1070, "Brandon Kmiec", Color.WHITE);
 
         mouseCursor.moveXAbsolute(p.x - 16);
         mouseCursor.moveYAbsolute(p.y - 18);
