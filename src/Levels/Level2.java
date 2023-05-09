@@ -14,6 +14,7 @@ import logic.Control;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class Level2 {
     // Fields
@@ -51,6 +52,7 @@ public class Level2 {
     private final Sound explosion;
     private final ArrayList<Command> commands;
     private final Interpreter interpreter;
+    private int invSlotNum;
 
     // Constructor
     public Level2(Control ctrl, Inventory inventory) {
@@ -84,7 +86,7 @@ public class Level2 {
                 new Frame(puzzleSprite.getX(), puzzleSprite.getY(), "simonSaysPuzzleHover"));
 
         itemSprite = new Sprite(1700, 500, ctrl.getSpriteFromBackBuffer("dynamite").getSprite(), "dynamite");
-        itemRect = new RECT(-50, -50, -50, -50, "dynamite", "dynamite");
+        itemRect = new RECT(-50, -50, -50, -50, "dynamite", "Dynamite");
 
         mouseCursor = new Sprite(0, 0, Graphic.rotateImageByDegrees(
                 ctrl.getSpriteFromBackBuffer("moveLevelCursor").getSprite(), -45), "mouseCursor");
@@ -119,7 +121,7 @@ public class Level2 {
             simonSays.setPuzzleActive(false);
             puzzleActive = false;
         }
-        if (simonSays.isPuzzleActive()) {
+        if (simonSays.isPuzzleActive() || puzzleActive) {
             puzzleActive = true;
 
             BufferedImage levelBackground = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
@@ -187,6 +189,7 @@ public class Level2 {
 
 //        ctrl.addSpriteToFrontBuffer(textBox);
         interpreter.checkCommand(commands.get(2));
+        interpreter.checkCommand(commands.get(3));
 
         ctrl.addSpriteToFrontBuffer(puzzleSprite);
 
@@ -308,12 +311,13 @@ public class Level2 {
                 if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && holdingItem) {
                     inInventory = true;
                     holdingItem = false;
+                    invSlotNum = i;
 
                     RECT clickedRect = inventorySlots[i];
                     itemSprite.moveXAbsolute(clickedRect.getX1() + 32);
                     itemSprite.moveYAbsolute(clickedRect.getY1() + 32);
-                    inventorySlots[i].changeHoverLabel(itemRect.getTag());
-                } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory) {
+                    inventorySlots[i].changeHoverLabel(itemRect.getHoverLabel());
+                } else if (inventorySlots[i].isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && inInventory && invSlotNum == i) {
                     holdingItem = true;
                     inInventory = false;
                     inventorySlots[i].changeHoverLabel("Inventory Slot #" + (i + 1));
@@ -338,6 +342,33 @@ public class Level2 {
                 if (!b)
                     commands.add(new Command(raw));
             }
+        }
+    }
+
+    public String saveData() {
+        return levelActive + "*" + startAnim + "*" + holdingItem + "*" + nextLevel + "*" + inInventory + "*" +
+                changeMouse + "*" + puzzleActive + "*" +  simonSays.isPuzzleSolved() + "*" + complete + "*" +
+                musicPlaying + "*" + itemSprite.getX() + "*" + itemSprite.getY() + "*" + invSlotNum;
+    }
+
+    public void loadData(String str) {
+        StringTokenizer st = new StringTokenizer(str, "*");
+        levelActive = Boolean.parseBoolean(st.nextToken());
+        startAnim = Boolean.parseBoolean(st.nextToken());
+        holdingItem = Boolean.parseBoolean(st.nextToken());
+        nextLevel = Boolean.parseBoolean(st.nextToken());
+        inInventory = Boolean.parseBoolean(st.nextToken());
+        changeMouse = Boolean.parseBoolean(st.nextToken());
+        puzzleActive = Boolean.parseBoolean(st.nextToken());
+        simonSays.setPuzzleSolved(Boolean.parseBoolean(st.nextToken()));
+        complete = Boolean.parseBoolean(st.nextToken());
+        musicPlaying = Boolean.parseBoolean(st.nextToken());
+
+        if (inInventory) {
+            itemSprite.moveXAbsolute(Integer.parseInt(st.nextToken()));
+            itemSprite.moveYAbsolute(Integer.parseInt(st.nextToken()));
+            invSlotNum = Integer.parseInt(st.nextToken());
+            inventorySlots[invSlotNum].changeHoverLabel(itemRect.getHoverLabel());
         }
     }
 }

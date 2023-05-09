@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class FinishScreen {
     // Fields
@@ -23,13 +24,16 @@ public class FinishScreen {
     private boolean levelActive;
     private boolean restartClicked;
     private boolean leaderboardClicked;
+    private boolean leaderboardAlreadyClicked;
     private final RECT leaderboardRect;
     private final RECT restartRect;
     private Duration completeTime;
+    private Duration elapsedTime;
     private final Sprite mouseCursor;
     private static Firework firework;
     private static String temp;
     private static int count;
+    private long totalTime;
 
     // Constructor
     public FinishScreen(Control ctrl) {
@@ -37,7 +41,9 @@ public class FinishScreen {
 
         this.ctrl = ctrl;
         levelActive = false;
+        restartClicked = false;
         leaderboardClicked = false;
+        leaderboardAlreadyClicked = false;
 
         mouseCursor = new Sprite(0, 0, Graphic.rotateImageByDegrees(
                 ctrl.getSpriteFromBackBuffer("moveLevelCursor").getSprite(), -45), "mouseCursor");
@@ -47,10 +53,12 @@ public class FinishScreen {
 
         temp = "";
         completeTime = null;
+        elapsedTime = null;
 
         firework = new Firework(200, 1000, 1720, 100, 25, 75, 5);
 
         count = 0;
+        totalTime = 0;
     }
 
     // Methods
@@ -58,8 +66,9 @@ public class FinishScreen {
         this.levelActive = isActive;
     }
 
-    public void setCompleteTime(Duration time) {
+    public void setCompleteTime(Duration time, Duration elapsedTime) {
         this.completeTime = time;
+        this.elapsedTime = elapsedTime;
     }
 
     public boolean isLevelActive() {
@@ -74,10 +83,15 @@ public class FinishScreen {
         Point p = Mouse.getMouseCoords();
 
         if (completeTime != null) {
-            long milliseconds = completeTime.toMillis() % 1000;
-            long seconds = completeTime.toMillis() / 1000 % 60;
-            long minutes = completeTime.toMillis() / (60 * 1000) % 60;
-            long hours = completeTime.toMillis() / (60 * 60 * 1000) % 24;
+            if (elapsedTime != null)
+                totalTime = elapsedTime.toMillis() + completeTime.toMillis();
+            else
+                totalTime = completeTime.toMillis();
+
+            long milliseconds = totalTime % 1000;
+            long seconds = totalTime / 1000 % 60;
+            long minutes = totalTime / (60 * 1000) % 60;
+            long hours = totalTime / (60 * 60 * 1000) % 24;
 
             temp = hours + ":" + minutes + ":" + seconds + "." + milliseconds;
 
@@ -117,7 +131,7 @@ public class FinishScreen {
         }
 
         if (count < 10000) {
-            UpdateParticles fireworkParticles = new UpdateParticles(ctrl, true, firework.getParticleSystem());
+            new UpdateParticles(ctrl, true, firework.getParticleSystem());
             for (int i = 0; i < firework.explosions.length; i++)
                 if (firework.explosions[i] != null) {
                     new UpdateParticles(ctrl, false, firework.explosions[i].getParticleSystem());
@@ -133,29 +147,55 @@ public class FinishScreen {
             if (restartRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
                 restartClicked = true;
             }
-            if (leaderboardRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON)) {
+            if (leaderboardRect.isClicked(Control.getMouseInput(), Click.LEFT_BUTTON) && !leaderboardAlreadyClicked) {
                 leaderboardClicked = true;
-
+                leaderboardAlreadyClicked = true;
                 // TODO: 5/1/2023 implement ability to read and store three letter player name with completed time
                 EZFileRead ezr = new EZFileRead("leaderboard.txt");
-                ArrayList<Integer> temp = new ArrayList<>();
+                ArrayList<Integer> timeList = new ArrayList<>();
 
                 int size = ezr.getNumLines();
                 if (size > 10)
                     size = 10;
 
+                boolean timeAdded = false;
                 for (int i = 0; i < size; i++) {
-                    temp.add(Integer.parseInt(ezr.getLine(i)));
-                    if (completeTime.toMillis() < temp.get(i))
-                        temp.add(i, (int) completeTime.toMillis());
+                    int currentTime = Integer.parseInt(ezr.getLine(i));
+                    if (totalTime < currentTime && !timeAdded) {
+                        timeList.add((int) totalTime);
+                        timeAdded = true;
+                    }
+                    timeList.add(currentTime);
+//                    temp.add(Integer.parseInt(ezr.getLine(i)));
+//                    if (totalTime < temp.get(i)) {
+//                        temp.add(i, (int) totalTime);
+//                        i++;
+//                    }
                     ezr.getNextLine();
                 }
 
                 EZFileWrite ezw = new EZFileWrite("leaderboard.txt");
-                for (Integer integer : temp)
+                for (Integer integer : timeList)
                     ezw.writeLine(String.valueOf(integer));
                 ezw.saveFile();
             }
         }
+    }
+
+    public String saveData() {
+        return levelActive + "*" + leaderboardAlreadyClicked + "*" + completeTime + "*" + elapsedTime;
+    }
+
+    public void loadData(String str) {
+        StringTokenizer st = new StringTokenizer(str, "*");
+        levelActive = Boolean.parseBoolean(st.nextToken());
+        leaderboardAlreadyClicked = Boolean.parseBoolean(st.nextToken());
+        completeTime = Duration.parse(st.nextToken());
+
+        String temp = st.nextToken();
+        if (!temp.equals("null"))
+            elapsedTime = Duration.parse(st.nextToken());
+        else
+            elapsedTime = null;
     }
 }

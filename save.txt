@@ -1,1 +1,5 @@
-26*59*40*81*50*88*32*21*69*74*41*7*11*93*84*10*34*87*82*8*93*32*33*16*49*66*40*83*67*21*22*88*26*44*73*16*37*8*66*82
+PT45.245S
+false*true*false*false*false*true*false*true*true*true*1142*383*0
+false*true*false*false*false*true*false*true*true*true*858*591*0
+false*false*true*false*true*true*true*729*738*0
+true*true*PT31.516S*null

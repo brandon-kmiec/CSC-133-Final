@@ -17,8 +17,8 @@ public class SimonSays {
     private final RECT playSequenceRect;
     private static RECT[] colorsRect;
     private static ArrayList<String> sequence, userSequence;
-    private static boolean solved;
-    private static boolean puzzleActive;
+    private boolean solved;
+    private boolean puzzleActive;
     private boolean exitPuzzle;
     private final Sprite mouseCursor;
     private static Animation sequenceAnim;
@@ -69,6 +69,8 @@ public class SimonSays {
         return solved;
     }
 
+    public void setPuzzleSolved(boolean puzzleSolved) {this.solved = puzzleSolved;}
+
     public boolean isExitPuzzle() {
         return exitPuzzle;
     }
@@ -77,8 +79,8 @@ public class SimonSays {
         return puzzleActive;
     }
 
-    public void setPuzzleActive(boolean puzzleActive) {
-        SimonSays.puzzleActive = puzzleActive;
+    public void setPuzzleActive(boolean isPuzzleActive) {
+        this.puzzleActive = isPuzzleActive;
     }
 
     private static void randomizeSequence() {
@@ -131,7 +133,7 @@ public class SimonSays {
             exitPuzzle = true;
     }
 
-    private static void checkSequence() {
+    private void checkSequence() {
         int count = 0;
         for (int i = 0; i < sequence.size(); i++) {
             if (!userSequence.get(i).equals(sequence.get(i)))
