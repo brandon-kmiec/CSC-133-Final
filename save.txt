@@ -1,5 +1,5 @@
-PT5M20.854S
-false*true*false*false*false*false*false*true*true*true*1700*500*0
-false*true*false*false*false*true*false*true*true*true*1700*500*0
-false*false*true*false*true*true*true*1500*750*0
-true*true*PT5.65S*PT5M9.032S
+PT37.299S
+true*false*false*false*false*false*false*true*false*false*1700*500*0
+false*false*false*false*false*false*false*false*false*false*1700*500*0
+false*false*false*false*false*false*false*1500*750*0
+false*false*null*null
