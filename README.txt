@@ -1,3 +1,5 @@
+Game engine was provided by Professor Phillips to students enrolled in his CSC 133 class.
+
 Instructions and Notes for CSC 131 Project
 ------------------------------------------------------------------------------------------------------------------------
 
